@@ -35,6 +35,7 @@ docker compose exec app composer install
 
 # 4. Ключ шифрування застосунку і таблиці БД
 docker compose exec app php artisan key:generate
+docker compose exec app php artisan security:generate-keys
 docker compose exec app php artisan migrate
 
 # 5. Зібрати фронтенд
@@ -56,11 +57,15 @@ docker compose run --rm node npm run build
 | Composer | `docker compose exec app composer …` |
 | Тести | `docker compose exec app php artisan test` |
 | Логи | `docker compose logs -f app web` |
+| Перевірити цілісність журналу дій | `docker compose exec app php artisan audit:verify` |
 | Консоль MySQL | `docker compose exec db mysql -u scimscore -p scimscore` |
 
 Підключення до БД з DBeaver/TablePlus: `127.0.0.1:3307`, користувач і пароль з `.env`.
 
 ## Безпека
+
+Деталі: [SECURITY.md](SECURITY.md).
+
 
 - `.env` ніколи не потрапляє в git (вже в `.gitignore`).
 - Порти відкриті лише на `127.0.0.1`, тобто ззовні комп'ютера сайт і БД недоступні.
