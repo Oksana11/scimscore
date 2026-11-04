@@ -8,13 +8,12 @@ use App\Enums\ScimVersion;
 /**
  * SCIM scoring. Pure calculation, no I/O besides reading the questionnaire definition.
  *
- * SCIM III (formulas of the original scimscore.com, 2012):
- *   SCI-ARMI per section = 100 · score / f(AMS), f = a + b·AMS + c·AMS²
- *   Grade A–H = nearest reference profile (sum of absolute item differences).
- *
- * SCIM IV (customer specification "SCIM", Google Doc):
+ * SCI-ARMI (customer specification "SCIM", Google Doc — the only formula in use, for SCIM III and IV):
  *   SCI-ARMI = 100 · SCIM / (30.6 + 1.225·AMS − 0.00474·AMS² − 0.126·Age − 1.96·Sex), Sex: male 0, female 1.
- *   Sections: plain sums only.
+ *   Sections (self-care, respiration/sphincter, mobility): plain sums only.
+ *
+ * Grade A–H (SCIM III only): nearest of 8 reference profiles of the original
+ * scimscore.com (sum of absolute item differences).
  *
  * Bump CALC_VERSION whenever a formula changes: it is stored with every assessment.
  */
@@ -23,14 +22,6 @@ final class ScimCalculator
     public const CALC_VERSION = [
         'III' => 'iii-2026.1',
         'IV' => 'iv-2026.1',
-    ];
-
-    /** SCIM III SCI-ARMI denominators: [a, b (AMS), c (AMS²)]. */
-    private const ARMI_III = [
-        'total' => [7.045, 1.615, -0.007],
-        'self_care' => [8.139, 0.216, -0.001],
-        'respiration_sphincter' => [14.097, 0.58, -0.003],
-        'mobility' => [-4.293, 0.625, -0.002],
     ];
 
     public function calculate(ScimVersion $version, ScimInput $input): ScimResult
@@ -44,10 +35,7 @@ final class ScimCalculator
         }
         $total = array_sum($sums);
 
-        $armi = match ($version) {
-            ScimVersion::III => $this->armiIII($sums, $total, $input->ams),
-            ScimVersion::IV => $this->armiIV($total, $input),
-        };
+        $sciarmi = $this->sciarmi($total, $input);
 
         [$grade, $gradeTotal] = $this->grade($definition, $answers);
 
@@ -58,49 +46,29 @@ final class ScimCalculator
             selfCare: $sums['self_care'],
             respirationSphincter: $sums['respiration_sphincter'],
             mobility: $sums['mobility'],
-            sciarmiTotal: $armi['total'],
-            sciarmiSelfCare: $armi['self_care'],
-            sciarmiRespirationSphincter: $armi['respiration_sphincter'],
-            sciarmiMobility: $armi['mobility'],
+            sciarmiTotal: $sciarmi,
+            sciarmiSelfCare: null,
+            sciarmiRespirationSphincter: null,
+            sciarmiMobility: null,
             grade: $grade,
             gradeReferenceTotal: $gradeTotal,
         );
     }
 
-    /**
-     * @param  array<string, int>  $sums
-     * @return array<string, float|null>
-     */
-    private function armiIII(array $sums, int $total, ?int $ams): array
+    private function sciarmi(int $total, ScimInput $input): ?float
     {
-        $scores = ['total' => $total] + $sums;
-        $out = [];
-
-        foreach (self::ARMI_III as $key => [$a, $b, $c]) {
-            $out[$key] = $ams === null ? null : $this->ratio($scores[$key], $a + $b * $ams + $c * $ams ** 2);
+        if ($input->ams === null || $input->age === null || $input->gender === null) {
+            return null;
         }
 
-        return $out;
+        $sex = $input->gender === Gender::Female ? 1 : 0;
+
+        return $this->ratio($total, 30.6 + 1.225 * $input->ams - 0.00474 * $input->ams ** 2 - 0.126 * $input->age - 1.96 * $sex);
     }
 
     /**
-     * @return array<string, float|null>
-     */
-    private function armiIV(int $total, ScimInput $input): array
-    {
-        $value = null;
-
-        if ($input->ams !== null && $input->age !== null && $input->gender !== null) {
-            $sex = $input->gender === Gender::Female ? 1 : 0;
-            $value = $this->ratio($total, 30.6 + 1.225 * $input->ams - 0.00474 * $input->ams ** 2 - 0.126 * $input->age - 1.96 * $sex);
-        }
-
-        return ['total' => $value, 'self_care' => null, 'respiration_sphincter' => null, 'mobility' => null];
-    }
-
-    /**
-     * Expected-score denominators can be zero or negative at very low AMS
-     * (mobility in SCIM III when AMS < 7): the index is undefined there.
+     * The expected score can be zero or negative for implausible inputs
+     * (e.g. very old age with AMS 0): the index is undefined there.
      */
     private function ratio(int $score, float $denominator): ?float
     {

@@ -55,22 +55,32 @@ class ScimCalculatorTest extends TestCase
 
     public function test_scim_iii_sums_and_sci_armi(): void
     {
-        $r = $this->calc(ScimVersion::III, new ScimInput($this->answers(self::E), ams: 50));
+        $r = $this->calc(ScimVersion::III, new ScimInput($this->answers(self::E), ams: 50, age: 40, gender: Gender::Male));
 
         $this->assertSame(50, $r->total);
         $this->assertSame(13, $r->selfCare);
         $this->assertSame(26, $r->respirationSphincter);
         $this->assertSame(11, $r->mobility);
-        $this->assertSame(71.13, $r->sciarmiTotal);
-        $this->assertSame(79.08, $r->sciarmiSelfCare);
-        $this->assertSame(73.04, $r->sciarmiRespirationSphincter);
-        $this->assertSame(50.1, $r->sciarmiMobility);
+        // 100 · 50 / (30.6 + 1.225·50 − 0.00474·50² − 0.126·40 − 1.96·0)
+        $this->assertSame(66.7, $r->sciarmiTotal);
+        // Sections: plain sums only
+        $this->assertNull($r->sciarmiSelfCare);
+        $this->assertNull($r->sciarmiRespirationSphincter);
+        $this->assertNull($r->sciarmiMobility);
+        $this->assertSame('E', $r->grade);
         $this->assertSame('iii-2026.1', $r->calcVersion);
+    }
+
+    public function test_female_sex_term_is_applied(): void
+    {
+        $r = $this->calc(ScimVersion::III, new ScimInput($this->answers(self::E), ams: 50, age: 40, gender: Gender::Female));
+
+        $this->assertSame(68.49, $r->sciarmiTotal);
     }
 
     public function test_full_independence_scores_100_and_grade_h(): void
     {
-        $r = $this->calc(ScimVersion::III, new ScimInput($this->answers(self::H), ams: 100));
+        $r = $this->calc(ScimVersion::III, new ScimInput($this->answers(self::H), ams: 100, age: 30, gender: Gender::Male));
 
         $this->assertSame(100, $r->total);
         $this->assertSame('H', $r->grade);
@@ -89,14 +99,16 @@ class ScimCalculatorTest extends TestCase
         $this->assertSame(82, array_sum($refs['G'])); // corrected typo from the old database (v3 = 34)
     }
 
-    public function test_sci_armi_is_null_without_ams_or_with_invalid_denominator(): void
+    public function test_sci_armi_is_null_without_required_data_or_with_invalid_denominator(): void
     {
-        $r = $this->calc(ScimVersion::III, new ScimInput($this->answers(self::E)));
-        $this->assertNull($r->sciarmiTotal);
+        $answers = $this->answers(self::E);
 
-        $r = $this->calc(ScimVersion::III, new ScimInput($this->answers(self::E), ams: 0));
-        $this->assertNull($r->sciarmiMobility); // −4.293 at AMS 0
-        $this->assertNotNull($r->sciarmiTotal);
+        $this->assertNull($this->calc(ScimVersion::III, new ScimInput($answers, age: 40, gender: Gender::Male))->sciarmiTotal);
+        $this->assertNull($this->calc(ScimVersion::III, new ScimInput($answers, ams: 50, gender: Gender::Male))->sciarmiTotal);
+        $this->assertNull($this->calc(ScimVersion::III, new ScimInput($answers, ams: 50, age: 40))->sciarmiTotal);
+
+        // 30.6 − 0.126·250 < 0
+        $this->assertNull($this->calc(ScimVersion::III, new ScimInput($answers, ams: 0, age: 250, gender: Gender::Male))->sciarmiTotal);
     }
 
     public function test_invalid_answers_are_rejected(): void
@@ -126,7 +138,7 @@ class ScimCalculatorTest extends TestCase
         $this->calc(ScimVersion::III, new ScimInput($answers));
     }
 
-    public function test_scim_iv_sci_armi_uses_age_and_sex(): void
+    public function test_scim_iv_uses_the_same_formula_and_has_no_grade(): void
     {
         // Same structure as III until the customer provides the SCIM IV questionnaire.
         $iii = json_decode((string) file_get_contents(resource_path('scim/scim-iii.json')), true);
