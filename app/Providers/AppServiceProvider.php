@@ -47,16 +47,23 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('web', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
 
-        // Used by OTP endpoints (stage 4).
-        RateLimiter::for('otp-send', fn (Request $request) => [
-            Limit::perMinute(1)->by('otp-send:email:'.strtolower((string) $request->input('email'))),
-            Limit::perHour(10)->by('otp-send:email-h:'.strtolower((string) $request->input('email'))),
-            Limit::perHour(30)->by('otp-send:ip:'.$request->ip()),
-        ]);
+        // OTP endpoints. Keys use a hash of the email so addresses never land in the cache store.
+        RateLimiter::for('otp-send', function (Request $request) {
+            $email = (string) ($request->input('email') ?? $request->input('new_email') ?? $request->session()->get('auth.otp_email', ''));
+            $key = hash('sha256', mb_strtolower(trim($email)));
+
+            return [
+                Limit::perMinute(1)->by('otp-send:email:'.$key),
+                Limit::perHour(10)->by('otp-send:email-h:'.$key),
+                Limit::perHour(30)->by('otp-send:ip:'.$request->ip()),
+            ];
+        });
 
         RateLimiter::for('otp-verify', fn (Request $request) => [
             Limit::perMinutes(15, 10)->by('otp-verify:ip:'.$request->ip()),
         ]);
+
+        RateLimiter::for('institution-search', fn (Request $request) => Limit::perMinute(60)->by('inst:'.($request->user()?->id ?? $request->ip())));
     }
 
     private function registerAuditListeners(): void
