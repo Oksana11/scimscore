@@ -23,7 +23,7 @@ services:
       - "127.0.0.1:${APP_PORT:-8080}:80"
     volumes:
       - ./public:/var/www/html/public:ro
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx:/etc/nginx/conf.d:ro
     depends_on: [app]
     networks: [backend]
     restart: unless-stopped
