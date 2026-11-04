@@ -36,7 +36,7 @@ docker compose exec app composer install
 # 4. Ключ шифрування застосунку і таблиці БД
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan security:generate-keys
-docker compose exec app php artisan migrate
+docker compose exec app php artisan migrate --seed
 
 # 5. Зібрати фронтенд
 docker compose run --rm node npm install

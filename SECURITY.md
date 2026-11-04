@@ -11,6 +11,10 @@
 | Production: debug примусово вимкнено, тільки HTTPS, заборона `migrate:fresh`/`db:wipe` | `AppServiceProvider::boot` |
 | Журнал дій (audit log) з HMAC-ланцюжком: зміна чи видалення запису виявляється `php artisan audit:verify`; OTP, токени, медичні дані не логуються | `app/Support/Security/AuditLogger.php` |
 | Blind index — пошук і перевірка дублів по зашифрованих полях без розшифрування | `app/Support/Security/BlindIndex.php` |
+| Шифрування в БД (AES-256, `APP_KEY`): email лікарів, Research ID і alias пацієнтів, відповіді анкет. Пошук — тільки через blind index | `encrypted` casts у `app/Models`, `HasBlindIndexes` |
+| Публічні ID у посиланнях — ULID (не вгадуються), внутрішні числові id назовні не видно | `public_id`, `#[RouteKey]` |
+| Розмежування даних: лікар бачить і змінює лише своїх пацієнтів/оцінки; оцінки незмінні; видалення заборонене | `app/Policies` |
+| Email і OTP-коди в таблицях OTP зберігаються лише як HMAC; для анонімних згод не зберігаються IP/User-Agent | `otp_requests`, `user_consents` |
 | Nginx виконує лише `index.php`, не віддає dot-файли | `docker/nginx/default.conf` |
 | CI: тести, стиль, `composer audit`, `npm audit`, пошук секретів (gitleaks); Dependabot | `.github/` |
 
