@@ -30,6 +30,11 @@ class User extends Authenticatable
     /** @var list<string> */
     protected array $blindIndexed = ['email'];
 
+    /** Defaults present on new instances (DB defaults are not loaded back after insert). */
+    protected $attributes = [
+        'is_active' => true,
+    ];
+
     protected function casts(): array
     {
         return [
