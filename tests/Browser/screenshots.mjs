@@ -81,7 +81,8 @@ const createUrl = page.url();
 for (const pick of [1, 2]) {
     if (pick === 2) await page.goto(createUrl);
     for (const name of await page.$$eval('input[type=radio][name^="answers"]', (els) => [...new Set(els.map((e) => e.name))])) {
-        await page.locator(`input[name="${name}"]`).nth(pick).check();
+        const opts = page.locator(`input[name="${name}"]`);
+        await opts.nth(Math.min(pick, (await opts.count()) - 1)).check();
     }
     await page.check('input[name=accept_terms]');
     await page.click('form button[type=submit]');
