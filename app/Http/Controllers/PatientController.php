@@ -68,7 +68,7 @@ class PatientController extends Controller
         Gate::authorize('create', Patient::class);
 
         $user = $request->user();
-        $data = $request->data();
+        $data = $request->patientData();
         $check = $this->duplicates->check($user, $data);
 
         if ($check->blocked()) {
@@ -135,7 +135,7 @@ class PatientController extends Controller
     {
         Gate::authorize('update', $patient);
 
-        $check = $this->duplicates->check($request->user(), $request->data(), except: $patient);
+        $check = $this->duplicates->check($request->user(), $request->patientData(), except: $patient);
 
         if ($check->blocked()) {
             return back()->withInput()->withErrors(['research_id' => $check->researchIdTakenInAccount

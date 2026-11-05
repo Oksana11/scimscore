@@ -39,7 +39,7 @@ class PatientRequest extends FormRequest
         ];
     }
 
-    public function data(): PatientData
+    public function patientData(): PatientData
     {
         $int = fn (string $k) => $this->validated($k) === null ? null : (int) $this->validated($k);
 
@@ -62,7 +62,7 @@ class PatientRequest extends FormRequest
      */
     public function patientAttributes(): array
     {
-        $d = $this->data();
+        $d = $this->patientData();
 
         return [
             'research_id' => $d->researchId,
