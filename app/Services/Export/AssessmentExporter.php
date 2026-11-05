@@ -40,11 +40,11 @@ final class AssessmentExporter
             $writer = new Writer;
             $writer->openToFile('php://output');
             $writer->getCurrentSheet()->setName('Assessments');
-            $writer->addRow(Row::fromValuesWithStyle($this->header($mode), new Style(fontBold: true)));
+            $writer->addRow(Row::fromValues($this->header($mode), (new Style)->setFontBold()));
 
             foreach ($assessments as $a) {
                 $writer->addRow(new Row(array_map(
-                    fn ($v) => is_int($v) || is_float($v) ? new NumericCell($v) : new StringCell((string) $v),
+                    fn ($v) => is_int($v) || is_float($v) ? new NumericCell($v, null) : new StringCell((string) $v, null),
                     $this->values($a, $mode),
                 )));
             }

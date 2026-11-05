@@ -63,9 +63,9 @@ class DashboardController extends AdminController
         return response()->streamDownload(function () use ($rows) {
             $w = new Writer;
             $w->openToFile('php://output');
-            $w->addRow(Row::fromValuesWithStyle(['Breakdown', 'Value', 'Count'], new Style(fontBold: true)));
+            $w->addRow(Row::fromValues(['Breakdown', 'Value', 'Count'], (new Style)->setFontBold()));
             foreach ($rows as [$t, $l, $c]) {
-                $w->addRow(new Row([new StringCell($t), new StringCell($l), new NumericCell($c)]));
+                $w->addRow(new Row([new StringCell($t, null), new StringCell($l, null), new NumericCell($c, null)]));
             }
             $w->close();
         }, $name, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);

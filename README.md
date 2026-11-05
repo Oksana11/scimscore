@@ -1,6 +1,6 @@
 # SCIMSCORE
 
-Laravel 13 · PHP 8.4 · MySQL 8.4 · Nginx · Mailpit (локальна пошта).
+Laravel 13 · PHP 8.3 · MySQL 8.4 · Nginx · Mailpit (локальна пошта).
 
 ## Що потрібно встановити
 
