@@ -1,7 +1,7 @@
 @extends('layouts.account')
 
 @section('title', 'New patient')
-@section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / New Patient@endsection
+@section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / New Patient @endsection
 
 @section('content')
     <div class="mx-auto max-w-[800px]">

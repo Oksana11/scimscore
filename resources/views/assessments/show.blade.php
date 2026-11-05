@@ -1,7 +1,7 @@
 @extends('layouts.account')
 
 @section('title', 'Assessment')
-@section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / {{ $assessment->patient->system_id }} / Result@endsection
+@section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / {{ $assessment->patient->system_id }} / Result @endsection
 
 @section('content')
     <div class="space-y-5">

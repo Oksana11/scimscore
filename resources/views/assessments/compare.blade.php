@@ -1,7 +1,7 @@
 @extends('layouts.account')
 
 @section('title', 'Compare assessments')
-@section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / Compare@endsection
+@section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / Compare @endsection
 
 @section('content')
     @php
