@@ -41,7 +41,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login/resend', [LoginController::class, 'resend'])->middleware('throttle:otp-send')->name('login.resend');
 });
 
-Route::middleware(['auth', 'active'])->group(function () {
+Route::middleware(['auth:web', 'active'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('/profile/complete', [ProfileController::class, 'complete'])->name('profile.complete');

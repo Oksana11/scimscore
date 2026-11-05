@@ -10,6 +10,8 @@
         <p style="margin:0 0 16px;font-size:14px">
             @if ($purpose === \App\Enums\OtpPurpose::EmailChange)
                 A request was made to change the sign-in email of a SCIMSCORE account to this address. Enter the code on your Profile page to confirm.
+            @elseif ($purpose === \App\Enums\OtpPurpose::AdminLogin)
+                Use the code below for step 1 of the SCIMSCORE administrator sign-in. You will then be asked for the code from your authenticator app.
             @elseif ($purpose === \App\Enums\OtpPurpose::QuickResultEmail)
                 Enter this code on the result page to receive your SCIM assessment result by email.
             @else

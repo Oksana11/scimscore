@@ -20,6 +20,7 @@ class OtpCodeMail extends Mailable
             OtpPurpose::Login => 'Your SCIMSCORE sign-in code',
             OtpPurpose::EmailChange => 'Confirm your new SCIMSCORE email address',
             OtpPurpose::QuickResultEmail => 'Your SCIMSCORE verification code',
+            OtpPurpose::AdminLogin => 'Your SCIMSCORE administrator sign-in code',
         });
     }
 
