@@ -21,31 +21,56 @@
             </div>
         </div>
 
-        @php $dup = session('duplicate'); @endphp
-        @if ($dup && ! $dup['blocked'])
-            <div class="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-[15px] text-amber-950" role="alert">
+        @php
+            $dup = session('duplicate');
+            $warn = $dup && ! $dup['blocked'];
+            // values entered in the form, carried into the "merge" request
+            $carry = collect(['nli', 'ais', 'ams', 'first_nli', 'first_ais', 'first_ams'])->mapWithKeys(fn ($k) => [$k => old($k)]);
+        @endphp
+
+        @if ($warn)
+            <section class="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-[15px] text-amber-950" role="alert">
+                <h2 class="flex items-center gap-2 font-bold"><x-icon name="alert" class="size-5" /> Possible duplicate — please check before saving</h2>
+
                 @if (! empty($dup['similar_own']))
-                    <p class="font-bold">A similar patient already exists in your list.</p>
-                    <p class="mt-1">Please verify whether this is the same patient before creating a new record.</p>
-                    <ul class="mt-3 space-y-1.5">
+                    <p class="mt-2">A similar patient already exists in your list. If it is the same person, merge: no new record is created and this assessment is added to the existing patient's history.</p>
+                    <div class="mt-4 space-y-3">
                         @foreach ($dup['similar_own'] as $p)
-                            <li>
-                                <a class="font-semibold underline" href="{{ route('patients.show', $p['public_id']) }}">{{ $p['system_id'] }} · {{ $p['research_id'] }} · {{ $p['alias'] }}</a>
-                                — <a class="btn-link" href="{{ route('patients.assessments.create', $p['public_id']) }}">add assessment to this patient</a>
-                            </li>
+                            <div class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-200 bg-white p-4 text-ink">
+                                <div>
+                                    <p><strong>{{ $p['alias'] }}</strong> <span class="font-mono text-sm text-slate-500">{{ $p['research_id'] }}</span></p>
+                                    <p class="text-sm text-slate-500">
+                                        <span class="font-mono">{{ $p['system_id'] }}</span> · {{ $p['gender'] }} · born {{ $p['birth_year'] }}
+                                        · {{ $p['assessments'] }} {{ \Illuminate\Support\Str::plural('assessment', $p['assessments']) }}
+                                        @if ($p['last']) · last: {{ $p['last'] }} @endif
+                                    </p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <a href="{{ route('patients.show', $p['public_id']) }}" class="btn-secondary py-2" target="_blank" rel="noopener">View</a>
+                                    <form method="POST" action="{{ route('patients.merge', $p['public_id']) }}">
+                                        @csrf
+                                        @foreach ($carry as $k => $val)<input type="hidden" name="{{ $k }}" value="{{ $val }}">@endforeach
+                                        <button type="submit" class="btn-primary py-2">Merge with this patient</button>
+                                    </form>
+                                </div>
+                            </div>
                         @endforeach
-                    </ul>
+                    </div>
                 @endif
+
                 @if ($dup['institution'])
-                    <p class="font-bold {{ empty($dup['similar_own']) ? '' : 'mt-4' }}">Possible duplicate patient detected.</p>
-                    <p class="mt-1">
-                        A patient with similar identifying and clinical characteristics may already exist in the system under the same institution.
-                        To protect patient privacy, no patient details can be displayed. Please verify internally whether this patient has already
-                        been registered by another authorized user from your institution before creating a new patient record.
-                    </p>
+                    <div class="{{ empty($dup['similar_own']) ? 'mt-2' : 'mt-5 border-t border-amber-200 pt-4' }}">
+                        <p class="font-semibold">Possible duplicate patient detected at your institution.</p>
+                        <p class="mt-1">
+                            A patient with similar identifying and clinical characteristics may already exist in the system under the same institution.
+                            To protect patient privacy, no patient details can be displayed. Please verify internally whether this patient has already
+                            been registered by another authorized user from your institution before creating a new patient record.
+                        </p>
+                    </div>
                 @endif
-                <p class="mt-3">If you have verified that this is a different patient, confirm below and save again.</p>
-            </div>
+
+                <p class="mt-4">Not the same person? Use <strong>Add as a new patient</strong> at the bottom of the form.</p>
+            </section>
         @elseif ($dup && $dup['blocked'] && $dup['own'])
             <div class="alert-error mt-4" role="alert">
                 This Research ID already exists in your list.
@@ -57,16 +82,13 @@
             @csrf
             @include('patients._form', ['patient' => null, 'isCreate' => true])
 
-            @if ($dup && ! $dup['blocked'])
-                <label class="mt-6 flex items-start gap-2.5 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">
-                    <input type="checkbox" name="confirm_not_duplicate" value="1" class="mt-0.5 size-4 accent-brand">
-                    I have verified that this is a different patient — create a new record.
-                </label>
-            @endif
-
             <div class="mt-6 flex justify-end gap-3 border-t border-line pt-5">
                 <a href="{{ route('patients.index') }}" class="btn-secondary">Cancel</a>
-                <button type="submit" class="btn-primary">Save &amp; start assessment →</button>
+                @if ($warn)
+                    <button type="submit" name="confirm_not_duplicate" value="1" class="btn-primary">Add as a new patient →</button>
+                @else
+                    <button type="submit" class="btn-primary">Save &amp; start assessment →</button>
+                @endif
             </div>
         </form>
     </div>

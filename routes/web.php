@@ -59,6 +59,7 @@ Route::middleware(['auth:web', 'active'])->group(function () {
         Route::post('/profile/email/confirm', [EmailChangeController::class, 'confirm'])->middleware('throttle:otp-verify')->name('profile.email.confirm');
 
         Route::resource('patients', PatientController::class)->except(['destroy']);
+        Route::post('/patients/{patient}/merge', [PatientController::class, 'mergeInto'])->name('patients.merge');
         Route::get('/patients/{patient}/assessments/create', [PatientAssessmentController::class, 'create'])->name('patients.assessments.create');
         Route::post('/patients/{patient}/assessments', [PatientAssessmentController::class, 'store'])->name('patients.assessments.store');
         Route::get('/patients/{patient}/compare', [AssessmentController::class, 'compare'])->name('patients.compare');

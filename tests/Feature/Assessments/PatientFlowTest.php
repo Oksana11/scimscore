@@ -213,6 +213,49 @@ class PatientFlowTest extends TestCase
         $this->assertSame(2, Patient::query()->count());
     }
 
+    public function test_merge_with_similar_patient_adds_assessment_to_existing_record(): void
+    {
+        $user = $this->doctor();
+        $existing = Patient::factory()->for($user)->create([
+            'research_id' => 'OLD1', 'alias' => 'J.D.', 'gender' => 1, 'birth_year' => 1985,
+        ]);
+
+        $this->actingAs($user)->from('/patients/create')->post('/patients', $this->patientForm(['first_nli' => 'T3', 'first_ais' => 'A']));
+        $this->assertSame(1, Patient::query()->count());
+
+        // the warning offers both choices
+        $this->get('/patients/create')->assertSee('Merge with this patient')->assertSee('Add as a new patient');
+
+        $this->post("/patients/{$existing->public_id}/merge", ['nli' => 'T4', 'ais' => 'A', 'ams' => 50, 'first_nli' => 'T3', 'first_ais' => 'A'])
+            ->assertRedirect("/patients/{$existing->public_id}/assessments/create");
+
+        $this->assertSame(1, Patient::query()->count());                 // no new record
+        $this->assertSame('T3', $existing->fresh()->first_nli->value);   // missing data filled in
+        $this->assertSame(['nli' => 'T4', 'ais' => 'A', 'ams' => 50], session("assessment.prefill.{$existing->public_id}"));
+
+        $this->post("/patients/{$existing->public_id}/assessments", $this->assessmentForm())->assertRedirect();
+        $this->assertSame(1, $existing->assessments()->count());
+        $this->assertDatabaseHas('audit_logs', ['action' => 'patient.duplicate_merged']);
+    }
+
+    public function test_merge_does_not_overwrite_existing_first_assessment_data(): void
+    {
+        $user = $this->doctor();
+        $existing = Patient::factory()->for($user)->create(['first_nli' => 'C5', 'first_ais' => 'B']);
+
+        $this->actingAs($user)->post("/patients/{$existing->public_id}/merge", ['nli' => 'T4', 'ais' => 'A', 'first_nli' => 'T3', 'first_ais' => 'A']);
+
+        $this->assertSame('C5', $existing->fresh()->first_nli->value);
+        $this->assertSame('B', $existing->fresh()->first_ais->value);
+    }
+
+    public function test_cannot_merge_into_another_users_patient(): void
+    {
+        $theirs = Patient::factory()->create();
+
+        $this->actingAs($this->doctor())->post("/patients/{$theirs->public_id}/merge", ['nli' => 'T4', 'ais' => 'A'])->assertNotFound();
+    }
+
     public function test_similar_patient_at_institution_gives_anonymous_warning(): void
     {
         $inst = Institution::factory()->create();

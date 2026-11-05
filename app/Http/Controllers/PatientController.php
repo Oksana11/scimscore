@@ -99,12 +99,20 @@ class PatientController extends Controller
         if ($check->hasWarnings() && ! $request->boolean('confirm_not_duplicate')) {
             return back()->withInput()->with('duplicate', [
                 'blocked' => false,
-                'similar_own' => $check->similarOwn->map(fn (Patient $p) => [
-                    'public_id' => $p->public_id,
-                    'system_id' => $p->system_id,
-                    'research_id' => $p->research_id,
-                    'alias' => $p->alias,
-                ])->all(),
+                'similar_own' => $check->similarOwn->map(function (Patient $p) {
+                    $last = $p->assessments->sortBy([['assessed_on', 'desc'], ['id', 'desc']])->first();
+
+                    return [
+                        'public_id' => $p->public_id,
+                        'system_id' => $p->system_id,
+                        'research_id' => $p->research_id,
+                        'alias' => $p->alias,
+                        'gender' => $p->gender->label(),
+                        'birth_year' => $p->birth_year,
+                        'assessments' => $p->assessments->count(),
+                        'last' => $last ? trim(($last->nli?->value ?? '—').' · AIS '.($last->ais?->value ?? '—').' · '.$last->assessed_on->format('j M Y')) : null,
+                    ];
+                })->all(),
                 'institution' => $check->similarInInstitution,
             ]);
         }
@@ -129,6 +137,43 @@ class PatientController extends Controller
 
         return redirect()->route('patients.assessments.create', $patient)
             ->with('status', __('Patient :id created. Please save the Patient Research ID in your local records and use exactly the same code for all future assessments of this patient.', ['id' => $patient->system_id]));
+    }
+
+    /**
+     * "Merge": the patient being created is the same person as an existing patient in the
+     * user's own list. No new record is created; missing "first assessment" data is filled in
+     * and the new assessment is added to the existing patient's history.
+     */
+    public function mergeInto(Request $request, Patient $patient): RedirectResponse
+    {
+        Gate::authorize('update', $patient);
+
+        $d = $request->validate([
+            'nli' => ['required', Rule::enum(NeurologicalLevel::class)],
+            'ais' => ['required', Rule::enum(AisGrade::class)],
+            'ams' => ['nullable', 'integer', 'between:0,100'],
+            'first_nli' => ['nullable', Rule::enum(NeurologicalLevel::class)],
+            'first_ais' => ['nullable', Rule::enum(AisGrade::class)],
+            'first_ams' => ['nullable', 'integer', 'between:0,100'],
+        ]);
+
+        foreach (['first_nli', 'first_ais', 'first_ams'] as $field) {
+            if ($patient->{$field} === null && ($d[$field] ?? null) !== null) {
+                $patient->{$field} = $d[$field];
+            }
+        }
+        $patient->save();
+
+        $this->audit->log('patient.duplicate_merged', $patient);
+
+        $request->session()->put("assessment.prefill.{$patient->public_id}", [
+            'nli' => $d['nli'],
+            'ais' => $d['ais'],
+            'ams' => isset($d['ams']) ? (int) $d['ams'] : null,
+        ]);
+
+        return redirect()->route('patients.assessments.create', $patient)
+            ->with('status', __('No new patient was created. The assessment will be added to :id (Research ID :rid).', ['id' => $patient->system_id, 'rid' => $patient->research_id]));
     }
 
     public function show(Request $request, Patient $patient): View
