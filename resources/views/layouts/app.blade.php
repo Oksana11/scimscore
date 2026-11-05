@@ -41,7 +41,7 @@
         @yield('content')
     </main>
 
-    <footer class="mx-auto max-w-5xl px-4 pb-10 text-xs text-slate-500">
+    <footer class="mx-auto max-w-5xl px-4 pb-10 text-center text-xs text-slate-500">
         © {{ date('Y') }} SCIMSCORE · Loewenstein Rehabilitation Medical Center ·
         <a href="{{ route('terms') }}" class="underline">Terms of Use</a>
     </footer>
