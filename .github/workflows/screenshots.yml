@@ -6,7 +6,7 @@ on:
     branches: ['stage-10-redesign']
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   screenshots:
@@ -33,6 +33,11 @@ jobs:
       - run: mkdir -p screenshots && node tests/Browser/screenshots.mjs
       - if: always()
         run: tail -n 60 storage/logs/laravel.log | grep -v "letter-spacing" || true
-      - uses: actions/upload-artifact@v4
+      - name: Publish screenshots to the 'screenshots' branch
         if: always()
-        with: { name: screenshots, path: screenshots/ }
+        run: |
+          cd screenshots
+          git init -q -b screenshots
+          git config user.name "github-actions" && git config user.email "actions@github.com"
+          git add -A && git commit -qm "Screenshots of ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" screenshots

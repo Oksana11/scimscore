@@ -16,6 +16,14 @@ const errors = [];
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 
 const shot = async (name) => { await page.waitForLoadState('networkidle'); await page.screenshot({ path: out(name), fullPage: true }); };
+const fail = async (e) => {
+    console.log('FAILED at', page.url(), e.message.split('\n')[0]);
+    console.log('field errors:', JSON.stringify(await page.$$eval('.field-error, .alert-error', (els) => els.map((e) => e.textContent.trim()))));
+    await page.screenshot({ path: out('99-failure'), fullPage: true });
+    await browser.close();
+    process.exit(1);
+};
+process.on('unhandledRejection', fail);
 
 await page.goto(BASE); await shot('01-landing');
 
