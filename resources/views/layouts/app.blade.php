@@ -18,6 +18,8 @@
                 @auth
                     @if (auth()->user()->profile)
                         <a href="{{ route('dashboard') }}" class="hover:underline">Dashboard</a>
+                        <a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a>
+                        <a href="{{ route('assessments.index') }}" class="hover:underline">History</a>
                         <a href="{{ route('profile.edit') }}" class="hover:underline">Profile</a>
                     @endif
                     <form method="POST" action="{{ route('logout') }}">

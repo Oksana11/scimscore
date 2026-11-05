@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\InstitutionSearchController;
+use App\Http\Controllers\PatientAssessmentController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuickAssessmentController;
 use Illuminate\Support\Facades\Route;
@@ -42,5 +45,14 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::post('/profile/email', [EmailChangeController::class, 'store'])->middleware('throttle:otp-send')->name('profile.email.store');
         Route::post('/profile/email/confirm', [EmailChangeController::class, 'confirm'])->middleware('throttle:otp-verify')->name('profile.email.confirm');
+
+        Route::resource('patients', PatientController::class)->except(['destroy']);
+        Route::get('/patients/{patient}/assessments/create', [PatientAssessmentController::class, 'create'])->name('patients.assessments.create');
+        Route::post('/patients/{patient}/assessments', [PatientAssessmentController::class, 'store'])->name('patients.assessments.store');
+        Route::get('/patients/{patient}/compare', [AssessmentController::class, 'compare'])->name('patients.compare');
+
+        Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
+        Route::get('/assessments/{assessment}', [AssessmentController::class, 'show'])->name('assessments.show');
+        Route::post('/assessments/{assessment}/email', [AssessmentController::class, 'email'])->middleware('throttle:result-email')->name('assessments.email');
     });
 });

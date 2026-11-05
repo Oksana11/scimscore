@@ -19,7 +19,7 @@
         <p style="margin:0 0 8px;font-size:32px;font-weight:bold;letter-spacing:8px;font-family:Courier New,monospace">{{ $code }}</p>
         <p style="margin:0 0 16px;font-size:13px;color:#475569">Valid for {{ $ttl }} minutes · single use</p>
         <p style="margin:0;font-size:13px;color:#475569">
-            Didn't request this? You can safely ignore this email — nobody can access your account without this code.
+            Didn't request this? You can safely ignore this email@if ($purpose === \App\Enums\OtpPurpose::Login) — nobody can access your account without this code@endif.
             Never share it with anyone, including SCIMSCORE staff.
         </p>
     </td></tr>
