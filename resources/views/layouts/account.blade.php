@@ -42,7 +42,7 @@
 
     <div class="flex min-h-screen min-w-0 flex-1 flex-col">
         <header class="sticky top-0 z-10 border-b border-line bg-white/95 backdrop-blur print:hidden">
-            <div class="flex items-center justify-between gap-4 px-5 py-3.5 sm:px-9">
+            <div class="flex h-14 items-center justify-between gap-4 px-5 sm:px-9">
                 <div class="flex items-center gap-3">
                     {{-- mobile menu (no JS) --}}
                     <details class="relative lg:hidden">
@@ -67,7 +67,7 @@
             </div>
         </header>
 
-        <main class="flex-1 px-5 py-8 sm:px-9">
+        <main class="flex-1 px-5 py-8 [--sticky-top:57px] sm:px-9">
             <div class="mx-auto max-w-5xl">
                 @if (session('status'))
                     <div class="alert-success mb-6" role="status">{{ session('status') }}</div>
