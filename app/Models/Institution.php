@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Institution from the Research Organization Registry (ror_id set)
@@ -31,5 +32,11 @@ class Institution extends Model
     public function mergedInto(): BelongsTo
     {
         return $this->belongsTo(self::class, 'merged_into_id');
+    }
+
+    /** @return HasMany<UserProfile, $this> */
+    public function profiles(): HasMany
+    {
+        return $this->hasMany(UserProfile::class);
     }
 }

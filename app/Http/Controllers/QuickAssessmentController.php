@@ -137,7 +137,7 @@ class QuickAssessmentController extends Controller
     {
         $this->authorizeSession($request, $assessment);
 
-        return $this->exporter->xlsx([$assessment->load('result')], 'scim-quick-'.$assessment->assessed_on->format('Ymd').'.xlsx', withPatient: false);
+        return $this->exporter->xlsx([$assessment->load('result')], 'scim-quick-'.$assessment->assessed_on->format('Ymd').'.xlsx', mode: AssessmentExporter::MODE_QUICK);
     }
 
     public function changeEmail(Request $request, Assessment $assessment): RedirectResponse

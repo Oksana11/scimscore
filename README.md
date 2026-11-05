@@ -58,6 +58,8 @@ docker compose run --rm node npm run build
 | Тести | `docker compose exec app php artisan test` |
 | Логи | `docker compose logs -f app web` |
 | Перевірити цілісність журналу дій | `docker compose exec app php artisan audit:verify` |
+| Створити адміністратора | `docker compose exec app php artisan admin:create email@example.org "Ім'я"` |
+| Скинути MFA адміністратора | `docker compose exec app php artisan admin:reset-mfa email@example.org` |
 | Консоль MySQL | `docker compose exec db mysql -u scimscore -p scimscore` |
 
 Підключення до БД з DBeaver/TablePlus: `127.0.0.1:3307`, користувач і пароль з `.env`.

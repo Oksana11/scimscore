@@ -18,6 +18,9 @@
 | Nginx виконує лише `index.php`, не віддає dot-файли | `docker/nginx/default.conf` |
 | CI: тести, стиль, `composer audit`, `npm audit`, пошук секретів (gitleaks); Dependabot | `.github/` |
 
+| Адмінка: окрема таблиця й guard, вхід = код на email + TOTP (застосунок-автентифікатор), захист від повтору коду, 30 хв неактивності → вихід; лише перегляд пацієнтів/оцінок (маршрутів редагування немає); Research ID і alias не показуються й не експортуються; дії адміна в журналі | `app/Http/Controllers/Admin`, `app/Support/Security/Totp.php` |
+| CSV/Excel: захист від formula injection | `CsvWriter`, `AssessmentExporter` |
+
 ## Ключі — зберігати окремо від бази
 
 | Ключ | Втрата означає |

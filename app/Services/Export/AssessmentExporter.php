@@ -6,7 +6,6 @@ use App\Models\Assessment;
 use App\Scoring\ScimDefinition;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
-use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Cell\NumericCell;
 use OpenSpout\Common\Entity\Cell\StringCell;
 use OpenSpout\Common\Entity\Row;
@@ -15,35 +14,55 @@ use OpenSpout\Writer\XLSX\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * PDF and Excel exports. Contents are minimised: no alias, no email, no internal ids;
- * the patient is identified by System ID and the user's own Research ID only.
- * Every text value is written as a typed string cell, so a value such as "=HYPERLINK(...)"
- * can never become a spreadsheet formula (formula injection).
+ * PDF, Excel and CSV exports. Contents are minimised per audience:
+ *   MODE_USER  — the doctor's own data: System ID + their own Research ID;
+ *   MODE_QUICK — anonymous quick assessment: no patient columns;
+ *   MODE_ADMIN — research export: System ID, institution, country, profession; never Research ID or alias.
+ * Text is always written as text: in Excel as typed string cells, in CSV with a leading
+ * apostrophe for values starting with = + - @ (spreadsheet formula injection).
  */
 final class AssessmentExporter
 {
+    public const MODE_USER = 'user';
+
+    public const MODE_QUICK = 'quick';
+
+    public const MODE_ADMIN = 'admin';
+
     private const ITEM_KEYS = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13', 'v14', 'v15', 'v16', 'v17', 'v18', 'v19'];
 
     /**
-     * @param  iterable<Assessment>  $assessments  with result and patient loaded
+     * @param  iterable<Assessment>  $assessments  with result (+ patient; + user.profile relations for admin)
      */
-    public function xlsx(iterable $assessments, string $filename, bool $withPatient = true): StreamedResponse
+    public function xlsx(iterable $assessments, string $filename, string $mode = self::MODE_USER): StreamedResponse
     {
-        return response()->streamDownload(function () use ($assessments, $withPatient) {
+        return response()->streamDownload(function () use ($assessments, $mode) {
             $writer = new Writer;
             $writer->openToFile('php://output');
             $writer->getCurrentSheet()->setName('Assessments');
-
-            $writer->addRow(Row::fromValuesWithStyle($this->header($withPatient), new Style(fontBold: true)));
+            $writer->addRow(Row::fromValuesWithStyle($this->header($mode), new Style(fontBold: true)));
 
             foreach ($assessments as $a) {
-                $writer->addRow(new Row($this->cells($a, $withPatient)));
+                $writer->addRow(new Row(array_map(
+                    fn ($v) => is_int($v) || is_float($v) ? new NumericCell($v) : new StringCell((string) $v),
+                    $this->values($a, $mode),
+                )));
             }
 
             $writer->close();
-        }, $filename, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
+        }, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+    }
+
+    /**
+     * @param  iterable<Assessment>  $assessments
+     */
+    public function csv(iterable $assessments, string $filename, string $mode = self::MODE_ADMIN): StreamedResponse
+    {
+        return CsvWriter::download($filename, $this->header($mode), (function () use ($assessments, $mode) {
+            foreach ($assessments as $a) {
+                yield $this->values($a, $mode);
+            }
+        })());
     }
 
     public function pdf(Assessment $assessment, string $filename): Response
@@ -68,10 +87,14 @@ final class AssessmentExporter
     /**
      * @return list<string>
      */
-    private function header(bool $withPatient): array
+    public function header(string $mode): array
     {
         return array_merge(
-            $withPatient ? ['System ID', 'Research ID'] : [],
+            match ($mode) {
+                self::MODE_USER => ['System ID', 'Research ID'],
+                self::MODE_ADMIN => ['System ID', 'Source', 'Institution', 'ROR ID', 'Country', 'Profession'],
+                default => [],
+            },
             ['Assessment date', 'SCIM version', 'Type', 'Gender', 'Year of birth', 'Age', 'Neurological level', 'AIS', 'AMS'],
             array_map('strtoupper', self::ITEM_KEYS),
             ['Self-care', 'Respiration & sphincter', 'Mobility', 'SCIM total', 'SCI-ARMI', 'Grade', 'Algorithm'],
@@ -79,40 +102,47 @@ final class AssessmentExporter
     }
 
     /**
-     * @return list<Cell>
+     * @return list<int|float|string|null>
      */
-    private function cells(Assessment $a, bool $withPatient): array
+    public function values(Assessment $a, string $mode): array
     {
-        $s = fn (?string $v) => new StringCell((string) $v);
-        $n = fn (int|float|string|null $v) => $v === null || $v === '' ? new StringCell('') : new NumericCell(+$v);
         $r = $a->result;
+        $profile = $mode === self::MODE_ADMIN ? $a->user?->profile : null;
+        $institution = $mode === self::MODE_ADMIN ? ($a->patient?->institution ?? $profile?->institution) : null;
 
-        $cells = $withPatient ? [$s($a->patient?->system_id), $s($a->patient?->research_id)] : [];
+        $prefix = match ($mode) {
+            self::MODE_USER => [$a->patient?->system_id, $a->patient?->research_id],
+            self::MODE_ADMIN => [
+                $a->patient?->system_id,
+                $a->source->value,
+                $institution?->name,
+                $institution?->ror_id,
+                $profile?->country_code,
+                $profile?->profession?->name,
+            ],
+            default => [],
+        };
 
-        $cells = array_merge($cells, [
-            $s($a->assessed_on->toDateString()),
-            $s($a->scim_version->value),
-            $s($a->patient_id === null ? 'Quick' : ($a->is_first ? 'First' : 'Follow-up')),
-            $s($a->gender->label()),
-            $n($a->patient?->birth_year),
-            $n($a->age),
-            $s($a->nli?->value),
-            $s($a->ais?->value),
-            $n($a->ams),
-        ]);
+        $items = array_map(fn ($k) => isset($a->answers[$k]) ? (int) $a->answers[$k] : null, self::ITEM_KEYS);
 
-        foreach (self::ITEM_KEYS as $k) {
-            $cells[] = $n($a->answers[$k] ?? null);
-        }
-
-        return array_merge($cells, [
-            $n($r->self_care),
-            $n($r->respiration_sphincter),
-            $n($r->mobility),
-            $n($r->total),
-            $n($r->sciarmi_total),
-            $s($r->grade),
-            $s($a->calc_version),
+        return array_merge($prefix, [
+            $a->assessed_on->toDateString(),
+            $a->scim_version->value,
+            $a->patient_id === null ? 'Quick' : ($a->is_first ? 'First' : 'Follow-up'),
+            $a->gender->label(),
+            $a->patient?->birth_year,
+            $a->age,
+            $a->nli?->value,
+            $a->ais?->value,
+            $a->ams,
+        ], $items, [
+            $r->self_care,
+            $r->respiration_sphincter,
+            $r->mobility,
+            $r->total,
+            $r->sciarmi_total === null ? null : (float) $r->sciarmi_total,
+            $r->grade,
+            $a->calc_version,
         ]);
     }
 }
