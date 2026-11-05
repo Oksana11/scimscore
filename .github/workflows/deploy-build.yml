@@ -1,0 +1,56 @@
+name: Build deploy branch
+
+# Builds a ready-to-run copy of `main` (PHP dependencies + compiled CSS/JS) and publishes it
+# to the `deploy` branch. The server (Plesk Git) pulls that branch: it needs only PHP 8.4,
+# no Composer and no Node.js. The branch is rewritten each time (single commit, no history).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, gd, zip, bcmath, pdo_mysql
+          coverage: none
+          tools: composer:v2
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: PHP dependencies (production only)
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+
+      - name: Security audit
+        run: composer audit --no-dev
+
+      - name: Frontend build
+        run: npm ci && npm run build
+
+      - name: Publish to the deploy branch
+        run: |
+          mkdir -p /tmp/deploy
+          rsync -a --exclude .git --exclude node_modules --exclude tests --exclude .github ./ /tmp/deploy/
+          rm -f /tmp/deploy/.env
+          cd /tmp/deploy
+          git init -q -b deploy
+          git config user.name "github-actions" && git config user.email "actions@github.com"
+          git add -A && git add -f vendor public/build
+          git commit -qm "Deploy build of ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" deploy
