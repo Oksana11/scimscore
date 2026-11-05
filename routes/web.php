@@ -5,10 +5,21 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\InstitutionSearchController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QuickAssessmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
 Route::view('/terms', 'terms')->name('terms');
+
+// --- Quick Assessment (no account) ---
+Route::prefix('quick')->name('quick.')->controller(QuickAssessmentController::class)->group(function () {
+    Route::get('/', 'create')->name('create');
+    Route::post('/', 'store')->middleware('throttle:quick-assessment')->name('store');
+    Route::get('/{assessment}', 'result')->name('result');
+    Route::post('/{assessment}/email', 'sendCode')->middleware('throttle:otp-send')->name('email.code');
+    Route::post('/{assessment}/email/send', 'sendResult')->middleware('throttle:otp-verify')->name('email.send');
+    Route::post('/{assessment}/email/change', 'changeEmail')->name('email.change');
+});
 
 // --- Sign in / registration (email + one-time code) ---
 Route::middleware('guest')->group(function () {

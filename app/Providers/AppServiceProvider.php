@@ -63,6 +63,8 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinutes(15, 10)->by('otp-verify:ip:'.$request->ip()),
         ]);
 
+        RateLimiter::for('quick-assessment', fn (Request $request) => Limit::perHour(60)->by('quick:'.$request->ip()));
+
         RateLimiter::for('institution-search', fn (Request $request) => Limit::perMinute(60)->by('inst:'.($request->user()?->id ?? $request->ip())));
     }
 

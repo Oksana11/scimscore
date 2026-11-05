@@ -27,7 +27,7 @@
                 <li>✓ Instant total and SCI-ARMI</li>
                 <li>✓ Print, PDF or Excel export</li>
             </ul>
-            <span class="btn-secondary mt-6 self-start opacity-60" aria-disabled="true">Coming soon</span>
+            <a href="{{ route('quick.create') }}" class="btn-secondary mt-6 self-start">Start quick assessment →</a>
         </div>
     </div>
 

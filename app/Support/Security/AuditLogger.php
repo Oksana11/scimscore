@@ -17,17 +17,23 @@ final class AuditLogger
 
     /**
      * @param  array<string, mixed>  $context  Never put OTP codes, tokens or medical data here.
+     * @param  string|null  $actorType  When given, $actorId is used as-is (null = no actor id).
+     * @param  bool  $anonymous  Do not store actor id, IP or user agent (anonymous Quick Assessment).
      */
-    public function log(string $action, ?Model $subject = null, array $context = [], ?string $actorType = null, ?int $actorId = null): AuditLog
+    public function log(string $action, ?Model $subject = null, array $context = [], ?string $actorType = null, ?int $actorId = null, bool $anonymous = false): AuditLog
     {
         [$detectedType, $detectedId] = $this->detectActor();
 
-        $request = app()->runningInConsole() && ! app()->runningUnitTests() ? null : request();
+        if ($anonymous) {
+            [$actorType, $actorId] = ['guest', null];
+        }
+
+        $request = $anonymous || (app()->runningInConsole() && ! app()->runningUnitTests()) ? null : request();
 
         $record = [
             'occurred_at' => now()->format('Y-m-d H:i:s.u'),
             'actor_type' => $actorType ?? $detectedType,
-            'actor_id' => $actorId ?? $detectedId,
+            'actor_id' => $actorType !== null ? $actorId : $detectedId,
             'action' => $action,
             'subject_type' => $subject ? class_basename($subject) : null,
             'subject_id' => $subject ? (string) $subject->getKey() : null,
