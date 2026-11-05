@@ -1,41 +1,51 @@
 {{-- SCIM questionnaire. Expects: $definition (App\Scoring\ScimDefinition). Answers posted as answers[vN]. --}}
-<div class="space-y-4" data-scim-form>
+<div class="space-y-5" data-scim-form>
+    <div class="flex items-baseline justify-between">
+        <h2 class="text-xl font-bold">SCIM Scores</h2>
+        <span class="text-sm text-slate-500">{{ count($definition->allowedScores()) }} items · {{ count($definition->sections()) }} domains · 0–100</span>
+    </div>
+
     @foreach ($definition->sections() as $section)
-        @php $max = collect($section['items'])->sum(fn ($i) => max(array_column($i['options'], 'score'))); @endphp
-        <details class="card p-0" open data-scim-section>
-            <summary class="flex cursor-pointer items-center justify-between gap-4 px-6 py-4">
-                <span class="font-semibold">{{ $section['title'] }}</span>
-                <span class="text-sm text-slate-600"><span data-section-sum>0</span> / {{ $max }}</span>
-            </summary>
-            <div class="space-y-6 border-t border-slate-200 px-6 py-5">
-                @php $lastGroup = null; @endphp
-                @foreach ($section['items'] as $item)
-                    @if (($item['group'] ?? null) && ($item['group'] ?? null) !== $lastGroup)
-                        <p class="font-medium text-slate-800">{{ rtrim($item['number'], 'AB') }}. {{ $item['group'] }}</p>
-                    @endif
-                    @php $lastGroup = $item['group'] ?? null; $field = 'answers.'.$item['key']; @endphp
-                    <fieldset class="{{ isset($item['group']) ? 'pl-4' : '' }}" @error($field) aria-invalid="true" @enderror>
-                        <legend class="mb-2 text-sm font-medium text-slate-900">
-                            {{ $item['number'] }}. {{ $item['title'] }}
-                        </legend>
-                        <div class="space-y-1.5">
-                            @foreach ($item['options'] as $opt)
-                                <label class="flex cursor-pointer items-start gap-3 rounded-lg px-2 py-1.5 text-sm hover:bg-slate-50 has-[:checked]:bg-blue-50">
-                                    <input type="radio" class="mt-0.5" name="answers[{{ $item['key'] }}]" value="{{ $opt['score'] }}"
-                                           @checked((string) old($field) === (string) $opt['score']) required>
-                                    <span><span class="inline-block w-6 font-semibold tabular-nums">{{ $opt['score'] }}</span>{{ $opt['label'] }}</span>
-                                </label>
+        @php
+            $max = collect($section['items'])->sum(fn ($i) => max(array_column($i['options'], 'score')));
+            $groups = collect($section['items'])->groupBy(fn ($i) => $i['group'] ?? '_'.$i['key']);
+        @endphp
+        <section class="card" data-scim-section>
+            <div class="flex items-center justify-between border-b border-line pb-3">
+                <h3 class="section-title">{{ $section['title'] }}</h3>
+                <span class="text-sm text-slate-500"><strong class="text-ink tabular-nums" data-section-sum>0</strong> / {{ $max }}</span>
+            </div>
+
+            <div class="mt-4 space-y-6">
+                @foreach ($groups as $groupKey => $items)
+                    @php $grouped = ! str_starts_with($groupKey, '_'); @endphp
+                    <div @class(['rounded-2xl border border-line bg-slate-50/70 p-4 sm:p-5' => $grouped])>
+                        @if ($grouped)
+                            <p class="mb-3 font-semibold text-brand">{{ rtrim($items->first()['number'], 'AB') }}: {{ $groupKey }}</p>
+                        @endif
+                        <div class="space-y-5">
+                            @foreach ($items as $item)
+                                @php $field = 'answers.'.$item['key']; @endphp
+                                <fieldset @error($field) aria-invalid="true" @enderror>
+                                    <legend class="mb-2 text-[15px] font-semibold text-ink">
+                                        {{ $grouped ? substr($item['number'], -1).': '.lcfirst($item['title']) : $item['number'].': '.$item['title'] }}: <span class="req">*</span>
+                                    </legend>
+                                    <div class="space-y-1">
+                                        @foreach ($item['options'] as $opt)
+                                            <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-transparent px-3 py-2 text-[15px] text-slate-700 hover:bg-slate-50 has-[:checked]:border-blue-200 has-[:checked]:bg-blue-50">
+                                                <input type="radio" class="mt-1 size-4 accent-brand" name="answers[{{ $item['key'] }}]" value="{{ $opt['score'] }}"
+                                                       @checked((string) old($field) === (string) $opt['score']) required>
+                                                <span><span class="mr-1 font-mono font-semibold text-ink">{{ $opt['score'] }}:</span>{{ $opt['label'] }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    @error($field) <p class="field-error">{{ $message }}</p> @enderror
+                                </fieldset>
                             @endforeach
                         </div>
-                        @error($field) <p class="field-error">{{ $message }}</p> @enderror
-                    </fieldset>
+                    </div>
                 @endforeach
             </div>
-        </details>
+        </section>
     @endforeach
-
-    <div class="card flex items-center justify-between">
-        <span class="font-semibold">SCIM total</span>
-        <span class="text-lg font-semibold tabular-nums"><span data-scim-total>0</span> / 100</span>
-    </div>
 </div>

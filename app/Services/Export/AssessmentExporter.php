@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * PDF, Excel and CSV exports. Contents are minimised per audience:
  *   MODE_USER  — the doctor's own data: System ID + their own Research ID;
- *   MODE_QUICK — anonymous quick assessment: no patient columns;
+ *   MODE_QUICK — anonymous quick assessment: the caregiver's own patient code only;
  *   MODE_ADMIN — research export: System ID, institution, country, profession; never Research ID or alias.
  * Text is always written as text: in Excel as typed string cells, in CSV with a leading
  * apostrophe for values starting with = + - @ (spreadsheet formula injection).
@@ -93,9 +93,9 @@ final class AssessmentExporter
             match ($mode) {
                 self::MODE_USER => ['System ID', 'Research ID'],
                 self::MODE_ADMIN => ['System ID', 'Source', 'Institution', 'ROR ID', 'Country', 'Profession'],
-                default => [],
+                default => ['Patient code'],
             },
-            ['Assessment date', 'SCIM version', 'Type', 'Gender', 'Year of birth', 'Age', 'Neurological level', 'AIS', 'AMS'],
+            ['Assessment date', 'SCIM version', 'Type', 'Gender', 'Year of birth', 'Age', 'Neurological level', 'AIS', 'AMS', 'Etiology'],
             array_map('strtoupper', self::ITEM_KEYS),
             ['Self-care', 'Respiration & sphincter', 'Mobility', 'SCIM total', 'SCI-ARMI', 'Grade', 'Algorithm'],
         );
@@ -108,7 +108,8 @@ final class AssessmentExporter
     {
         $r = $a->result;
         $profile = $mode === self::MODE_ADMIN ? $a->user?->profile : null;
-        $institution = $mode === self::MODE_ADMIN ? ($a->patient?->institution ?? $profile?->institution) : null;
+        // Account assessments: the doctor's profile; quick assessments: caregiver details given in step 1.
+        $institution = $mode === self::MODE_ADMIN ? ($a->patient?->institution ?? $profile?->institution ?? $a->caregiverInstitution) : null;
 
         $prefix = match ($mode) {
             self::MODE_USER => [$a->patient?->system_id, $a->patient?->research_id],
@@ -117,10 +118,10 @@ final class AssessmentExporter
                 $a->source->value,
                 $institution?->name,
                 $institution?->ror_id,
-                $profile?->country_code,
-                $profile?->profession?->name,
+                $profile?->country_code ?? $a->caregiver_country_code,
+                $profile?->profession?->name ?? $a->caregiverProfession?->name,
             ],
-            default => [],
+            default => [$a->patient_code],
         };
 
         $items = array_map(fn ($k) => isset($a->answers[$k]) ? (int) $a->answers[$k] : null, self::ITEM_KEYS);
@@ -135,6 +136,7 @@ final class AssessmentExporter
             $a->nli?->value,
             $a->ais?->value,
             $a->ams,
+            $a->etiology?->label(),
         ], $items, [
             $r->self_care,
             $r->respiration_sphincter,

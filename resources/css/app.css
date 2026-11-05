@@ -1,21 +1,52 @@
+/* Fonts are self-hosted (bundled by Vite): no requests to third parties, CSP font-src 'self'. */
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-sans/700.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/600.css';
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+    --color-page: #eef2f7;
+    --color-line: #e7ecf3;
+    --color-ink: #0f172a;
+    --color-brand: #2563eb;
+    --color-brand-dark: #1d4ed8;
+    --color-brand-soft: #eef3fd;
 }
 
-/* Small set of shared UI classes (Tailwind v4 @utility so they can be combined with @apply). */
-@utility card { @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm; }
-@utility label { @apply mb-1 block text-sm font-medium text-slate-700; }
-@utility input { @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none; }
-@utility btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50; }
-@utility btn-primary { @apply btn bg-blue-700 text-white hover:bg-blue-800 focus:ring-blue-600; }
-@utility btn-secondary { @apply btn border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 focus:ring-slate-400; }
-@utility btn-link { @apply text-sm font-medium text-blue-700 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:text-slate-400 disabled:no-underline; }
-@utility field-error { @apply mt-1 text-sm text-red-700; }
-@utility alert-success { @apply rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800; }
-@utility alert-error { @apply rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800; }
+/* Shared UI classes (Tailwind v4 @utility so they can be combined with @apply). */
+@utility card { @apply rounded-2xl border border-line bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04)]; }
+@utility label { @apply mb-1.5 block text-sm font-semibold text-slate-800; }
+@utility input { @apply block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-[15px] text-ink shadow-none placeholder:text-slate-400 focus:border-brand focus:ring-4 focus:ring-brand/15 focus:outline-none; }
+@utility btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:ring-4 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50; }
+@utility btn-primary { @apply btn bg-brand text-white hover:bg-brand-dark focus:ring-brand/25; }
+@utility btn-secondary { @apply btn border border-slate-300 bg-white text-ink hover:bg-slate-50 focus:ring-slate-200; }
+@utility btn-link { @apply text-sm font-semibold text-brand underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:text-slate-400 disabled:no-underline; }
+@utility back-link { @apply inline-flex items-center gap-1 text-sm font-semibold text-slate-500 hover:text-ink; }
+@utility field-error { @apply mt-1.5 text-sm text-red-600; }
+@utility hint { @apply mt-1.5 text-xs text-slate-500; }
+@utility req { @apply text-red-600; }
+@utility alert-success { @apply rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800; }
+@utility alert-error { @apply rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800; }
+@utility alert-warn { @apply rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900; }
+@utility pill { @apply inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700; }
+@utility pill-iv { @apply inline-flex items-center rounded-md bg-violet-100 px-2 py-0.5 text-xs font-semibold text-violet-700; }
+@utility th { @apply px-5 py-3 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase; }
+@utility td { @apply px-5 py-3.5; }
+@utility section-title { @apply text-base font-semibold text-ink; }
+@utility page-title { @apply text-[28px] leading-tight font-bold tracking-tight text-ink; }
+@utility page-sub { @apply mt-1 text-[15px] text-slate-500; }
+@utility avatar { @apply inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand; }
+
+@layer base {
+    html { -webkit-font-smoothing: antialiased; }
+    body { @apply bg-page font-sans text-ink; }
+    meter::-webkit-meter-optimum-value { background: var(--color-brand); }
+}

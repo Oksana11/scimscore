@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AisGrade;
 use App\Enums\AssessmentSource;
+use App\Enums\Etiology;
 use App\Enums\Gender;
 use App\Enums\NeurologicalLevel;
 use App\Enums\ScimVersion;
@@ -26,6 +27,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'source', 'user_id', 'patient_id', 'consent_id', 'scim_version', 'assessed_on', 'is_first',
     'gender', 'age', 'nli', 'ais', 'ams', 'answers', 'calc_version',
     'access_token_hash', 'access_expires_at', 'legacy_ref',
+    'caregiver_profession_id', 'caregiver_country_code', 'caregiver_institution_id',
+    'caregiver_title', 'caregiver_organization', 'caregiver_department', 'patient_code', 'etiology',
 ])]
 #[Hidden(['access_token_hash', 'legacy_ref'])]
 #[RouteKey('public_id')]
@@ -48,6 +51,8 @@ class Assessment extends Model
             'ams' => 'integer',
             'answers' => 'encrypted:array',
             'access_expires_at' => 'datetime',
+            'patient_code' => 'encrypted',
+            'etiology' => Etiology::class,
         ];
     }
 
@@ -85,5 +90,23 @@ class Assessment extends Model
     public function result(): HasOne
     {
         return $this->hasOne(AssessmentResult::class);
+    }
+
+    /** @return BelongsTo<Profession, $this> */
+    public function caregiverProfession(): BelongsTo
+    {
+        return $this->belongsTo(Profession::class, 'caregiver_profession_id');
+    }
+
+    /** @return BelongsTo<Institution, $this> */
+    public function caregiverInstitution(): BelongsTo
+    {
+        return $this->belongsTo(Institution::class, 'caregiver_institution_id');
+    }
+
+    /** @return BelongsTo<Country, $this> */
+    public function caregiverCountry(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'caregiver_country_code', 'code');
     }
 }

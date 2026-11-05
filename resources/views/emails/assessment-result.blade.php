@@ -6,6 +6,9 @@
     <tr><td style="padding:24px">
         <p style="margin:0 0 4px;font-weight:bold">SCIMSCORE</p>
         <h1 style="margin:0 0 16px;font-size:20px">SCIM {{ $assessment->scim_version->value }} assessment result</h1>
+        @if ($assessment->patient_code)
+            <p style="margin:0 0 12px;font-size:14px">Patient code: <strong>{{ $assessment->patient_code }}</strong></p>
+        @endif
         @if ($assessment->patient)
             <p style="margin:0 0 12px;font-size:14px">
                 Patient: <strong>{{ $assessment->patient->system_id }}</strong> · Research ID <strong>{{ $assessment->patient->research_id }}</strong>

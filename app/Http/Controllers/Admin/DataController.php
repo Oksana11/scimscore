@@ -88,7 +88,7 @@ class DataController extends AdminController
         $this->log('admin.export_assessments', context: ['format' => $format, 'rows' => $count]);
 
         $rows = $this->query($f)
-            ->with(['result', 'patient.institution', 'user.profile.institution', 'user.profile.profession'])
+            ->with(['result', 'patient.institution', 'user.profile.institution', 'user.profile.profession', 'caregiverInstitution', 'caregiverProfession'])
             ->orderBy('id')
             ->lazy(500);
         $name = 'scim-assessments-all-'.now()->format('Ymd-His').'.'.$format;

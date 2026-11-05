@@ -20,9 +20,14 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'home')->name('home');
 Route::view('/terms', 'terms')->name('terms');
 
+// Institution autocomplete (profile and Quick Assessment step 1): our DB + ROR, rate-limited.
+Route::get('/institutions/search', InstitutionSearchController::class)->middleware('throttle:institution-search')->name('institutions.search');
+
 // --- Quick Assessment (no account) ---
 Route::prefix('quick')->name('quick.')->controller(QuickAssessmentController::class)->group(function () {
     Route::get('/', 'create')->name('create');
+    Route::post('/caregiver', 'saveCaregiver')->middleware('throttle:quick-assessment')->name('caregiver');
+    Route::get('/assessment', 'assessment')->name('assessment');
     Route::post('/', 'store')->middleware('throttle:quick-assessment')->name('store');
     Route::get('/{assessment}', 'result')->name('result');
     Route::post('/{assessment}/email', 'sendCode')->middleware('throttle:otp-send')->name('email.code');
@@ -46,7 +51,6 @@ Route::middleware(['auth:web', 'active'])->group(function () {
 
     Route::get('/profile/complete', [ProfileController::class, 'complete'])->name('profile.complete');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::get('/institutions/search', InstitutionSearchController::class)->middleware('throttle:institution-search')->name('institutions.search');
 
     Route::middleware('profile.complete')->group(function () {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
@@ -59,6 +63,7 @@ Route::middleware(['auth:web', 'active'])->group(function () {
         Route::post('/patients/{patient}/assessments', [PatientAssessmentController::class, 'store'])->name('patients.assessments.store');
         Route::get('/patients/{patient}/compare', [AssessmentController::class, 'compare'])->name('patients.compare');
 
+        Route::view('/assessments/new', 'assessments.new')->name('assessments.new');
         Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
         Route::get('/assessments/export/xlsx', [AssessmentController::class, 'exportXlsx'])->middleware('throttle:export')->name('assessments.export.xlsx');
         Route::get('/assessments/export/pdf', [AssessmentController::class, 'exportPdf'])->middleware('throttle:export')->name('assessments.export.pdf');

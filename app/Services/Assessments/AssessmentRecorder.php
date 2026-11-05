@@ -31,9 +31,12 @@ final class AssessmentRecorder
      *
      * @param  array<string, mixed>  $answers
      */
-    public function recordQuick(ScimVersion $version, array $answers, PatientSnapshot $patient, CarbonInterface $assessedOn, ?User $user = null): Assessment
+    /**
+     * @param  array<string, mixed>  $details  caregiver_* fields, patient_code, etiology
+     */
+    public function recordQuick(ScimVersion $version, array $answers, PatientSnapshot $patient, CarbonInterface $assessedOn, array $details = []): Assessment
     {
-        return $this->record(AssessmentSource::Quick, $version, $answers, $patient, $assessedOn, $user, null, false);
+        return $this->record(AssessmentSource::Quick, $version, $answers, $patient, $assessedOn, null, null, false, $details);
     }
 
     /**
@@ -60,19 +63,23 @@ final class AssessmentRecorder
         ?User $user,
         ?Patient $patientModel,
         bool $isFirst,
+        array $details = [],
     ): Assessment {
         // Validates answers (throws InvalidScimAnswers) before anything is written.
         $result = $this->calculator->calculate($version, new ScimInput($answers, $patient->ams, $patient->age, $patient->gender));
         $clean = array_map('intval', array_intersect_key($answers, array_flip(array_keys(ScimDefinition::for($version)->allowedScores()))));
 
-        $assessment = DB::transaction(function () use ($source, $version, $clean, $patient, $assessedOn, $user, $patientModel, $isFirst, $result) {
+        $assessment = DB::transaction(function () use ($source, $version, $clean, $patient, $assessedOn, $user, $patientModel, $isFirst, $result, $details) {
             $consent = UserConsent::query()->create([
                 'user_id' => $source === AssessmentSource::Quick ? null : $user?->id,
                 'terms_version' => (string) config('scim.terms_version'),
                 'accepted_at' => now(),
             ]);
 
-            $assessment = Assessment::query()->create([
+            $allowed = ['caregiver_profession_id', 'caregiver_country_code', 'caregiver_institution_id', 'caregiver_title',
+                'caregiver_organization', 'caregiver_department', 'patient_code', 'etiology'];
+
+            $assessment = Assessment::query()->create(array_intersect_key($details, array_flip($allowed)) + [
                 'source' => $source,
                 'user_id' => $source === AssessmentSource::Quick ? null : $user?->id,
                 'patient_id' => $patientModel?->id,

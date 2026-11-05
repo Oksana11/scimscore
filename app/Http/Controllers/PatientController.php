@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\AisGrade;
 use App\Enums\Gender;
 use App\Enums\NeurologicalLevel;
+use App\Enums\ScimVersion;
 use App\Http\Requests\PatientRequest;
 use App\Models\Patient;
 use App\Services\Patients\DuplicateDetector;
@@ -29,6 +30,8 @@ class PatientController extends Controller
         Gate::authorize('viewAny', Patient::class);
 
         $f = $request->validate([
+            'q' => ['nullable', 'string', 'max:50'],
+            'version' => ['nullable', Rule::enum(ScimVersion::class)],
             'research_id' => ['nullable', 'string', 'max:50'],
             'alias' => ['nullable', 'string', 'max:50'],
             'gender' => ['nullable', Rule::enum(Gender::class)],
@@ -38,8 +41,20 @@ class PatientController extends Controller
             'ams' => ['nullable', 'integer', 'between:0,100'],
         ]);
 
+        $q = trim((string) ($f['q'] ?? ''));
+
         $patients = Patient::query()
             ->ownedBy($request->user())
+            // One search box: exact Research ID or alias (encrypted → blind index), or a year of birth.
+            ->when($q !== '', fn (Builder $query) => $query->where(function (Builder $w) use ($q) {
+                $probe = new Patient;
+                $w->where('research_id_bidx', $probe->blindIndexFor('research_id', $q))
+                    ->orWhere('alias_bidx', $probe->blindIndexFor('alias', $q));
+                if (preg_match('/^\d{4}$/', $q)) {
+                    $w->orWhere('birth_year', (int) $q);
+                }
+            }))
+            ->when($f['version'] ?? null, fn (Builder $query, $v) => $query->whereHas('assessments', fn ($a) => $a->where('scim_version', $v)))
             ->when($f['research_id'] ?? null, fn (Builder $q, $v) => $q->whereBlind('research_id', $v))
             ->when($f['alias'] ?? null, fn (Builder $q, $v) => $q->whereBlind('alias', $v))
             ->when($f['gender'] ?? null, fn (Builder $q, $v) => $q->where('gender', $v))
@@ -47,6 +62,7 @@ class PatientController extends Controller
             ->when($f['nli'] ?? null, fn (Builder $q, $v) => $q->where(fn ($w) => $w->where('first_nli', $v)->orWhereHas('assessments', fn ($a) => $a->where('nli', $v))))
             ->when($f['ais'] ?? null, fn (Builder $q, $v) => $q->where(fn ($w) => $w->where('first_ais', $v)->orWhereHas('assessments', fn ($a) => $a->where('ais', $v))))
             ->when(isset($f['ams']), fn (Builder $q) => $q->where(fn ($w) => $w->where('first_ams', $f['ams'])->orWhereHas('assessments', fn ($a) => $a->where('ams', $f['ams']))))
+            ->with('latestAssessment.result')
             ->withCount('assessments')
             ->withMax('assessments', 'assessed_on')
             ->latest('id')

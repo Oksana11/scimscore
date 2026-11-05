@@ -1,90 +1,64 @@
-@extends('layouts.app')
+@extends('layouts.account')
 
 @section('title', 'My Patients')
+@section('breadcrumb', 'My Patients')
 
 @section('content')
-    <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-semibold">My Patients</h1>
-            <p class="text-sm text-slate-600">Only you can see your patients. Search for an existing patient before creating a new one.</p>
+            <h1 class="page-title">My Patients</h1>
+            <p class="page-sub">Only patients you created are shown.</p>
         </div>
-        <a href="{{ route('patients.create') }}" class="btn-primary">+ New patient</a>
+        <a href="{{ route('patients.create') }}" class="btn-primary"><x-icon name="plus" class="size-4" /> New patient</a>
     </div>
 
-    <form method="GET" action="{{ route('patients.index') }}" class="card mt-6 grid gap-4 sm:grid-cols-4 lg:grid-cols-8">
-        <div class="lg:col-span-2">
-            <label for="f_rid" class="label">Research ID</label>
-            <input id="f_rid" name="research_id" class="input" value="{{ $filters['research_id'] ?? '' }}" autocomplete="off">
-        </div>
-        <div class="lg:col-span-2">
-            <label for="f_alias" class="label">Alias</label>
-            <input id="f_alias" name="alias" class="input" value="{{ $filters['alias'] ?? '' }}" autocomplete="off">
-        </div>
-        <div>
-            <label for="f_gender" class="label">Gender</label>
-            <select id="f_gender" name="gender" class="input">
-                <option value="">Any</option>
-                @foreach ($genders as $g)<option value="{{ $g->value }}" @selected((string) ($filters['gender'] ?? '') === (string) $g->value)>{{ $g->label() }}</option>@endforeach
-            </select>
-        </div>
-        <div>
-            <label for="f_yob" class="label">Year of birth</label>
-            <input id="f_yob" name="birth_year" type="number" class="input" value="{{ $filters['birth_year'] ?? '' }}">
-        </div>
-        <div>
-            <label for="f_nli" class="label">Level</label>
-            <select id="f_nli" name="nli" class="input">
-                <option value="">Any</option>
-                @foreach ($levels as $l)<option value="{{ $l->value }}" @selected(($filters['nli'] ?? '') === $l->value)>{{ $l->value }}</option>@endforeach
-            </select>
-        </div>
-        <div>
-            <label for="f_ais" class="label">AIS</label>
-            <select id="f_ais" name="ais" class="input">
-                <option value="">Any</option>
-                @foreach ($aisGrades as $a)<option value="{{ $a->value }}" @selected(($filters['ais'] ?? '') === $a->value)>{{ $a->value }}</option>@endforeach
-            </select>
-        </div>
-        <div>
-            <label for="f_ams" class="label">AMS</label>
-            <input id="f_ams" name="ams" type="number" min="0" max="100" class="input" value="{{ $filters['ams'] ?? '' }}">
-        </div>
-        <div class="flex items-end gap-2 sm:col-span-3 lg:col-span-7">
-            <button type="submit" class="btn-secondary">Search</button>
-            @if (array_filter($filters))<a href="{{ route('patients.index') }}" class="btn-link">Clear</a>@endif
-        </div>
+    <form method="GET" action="{{ route('patients.index') }}" class="card mt-6 flex flex-wrap gap-3 p-4">
+        <label class="relative min-w-60 flex-1">
+            <span class="sr-only">Search</span>
+            <x-icon name="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" />
+            <input name="q" class="input pl-10" value="{{ $filters['q'] ?? '' }}" placeholder="Research ID, alias or year of birth" autocomplete="off">
+        </label>
+        <select name="gender" class="input w-auto" aria-label="Gender">
+            <option value="">Any gender</option>
+            @foreach ($genders as $g)<option value="{{ $g->value }}" @selected((string) ($filters['gender'] ?? '') === (string) $g->value)>{{ $g->label() }}</option>@endforeach
+        </select>
+        <select name="version" class="input w-auto" aria-label="SCIM version">
+            <option value="">Any SCIM version</option>
+            @foreach (\App\Enums\ScimVersion::cases() as $v)<option value="{{ $v->value }}" @selected(($filters['version'] ?? '') === $v->value)>SCIM {{ $v->value }}</option>@endforeach
+        </select>
+        <button type="submit" class="btn-secondary">Search</button>
+        @if (array_filter($filters))<a href="{{ route('patients.index') }}" class="btn-link self-center">Clear</a>@endif
     </form>
-    <p class="mt-2 text-xs text-slate-500">Research ID and alias are matched exactly (they are stored encrypted).</p>
+    <p class="mt-2 text-xs text-slate-500">Research ID and alias are matched exactly — they are stored encrypted.</p>
 
-    <div class="card mt-6 overflow-x-auto p-0">
-        <table class="w-full text-sm">
-            <thead class="border-b border-slate-200 text-left text-slate-500">
-                <tr>
-                    <th class="px-4 py-3 font-medium">System ID</th>
-                    <th class="px-4 py-3 font-medium">Research ID</th>
-                    <th class="px-4 py-3 font-medium">Alias</th>
-                    <th class="px-4 py-3 font-medium">Gender</th>
-                    <th class="px-4 py-3 font-medium">Born</th>
-                    <th class="px-4 py-3 text-right font-medium">Assessments</th>
-                    <th class="px-4 py-3 font-medium">Last</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse ($patients as $p)
-                    <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3"><a class="btn-link" href="{{ route('patients.show', $p) }}">{{ $p->system_id }}</a></td>
-                        <td class="px-4 py-3">{{ $p->research_id }}</td>
-                        <td class="px-4 py-3">{{ $p->alias }}</td>
-                        <td class="px-4 py-3">{{ $p->gender->label() }}</td>
-                        <td class="px-4 py-3">{{ $p->birth_year }}</td>
-                        <td class="px-4 py-3 text-right tabular-nums">{{ $p->assessments_count }}</td>
-                        <td class="px-4 py-3">{{ $p->assessments_max_assessed_on ? \Illuminate\Support\Carbon::parse($p->assessments_max_assessed_on)->format('d M Y') : '—' }}</td>
-                    </tr>
-                @empty
-                    <tr><td colspan="7" class="px-4 py-8 text-center text-slate-500">{{ array_filter($filters) ? 'No matching patients.' : 'No patients yet.' }}</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+    <section class="card mt-4 overflow-hidden p-0">
+        <div class="flex items-center justify-between px-5 py-3.5">
+            <p class="text-[15px] text-slate-600">{{ $patients->total() }} patients</p>
+            <button type="button" class="btn-secondary py-1.5 print:hidden" data-print><x-icon name="print" class="size-4" /> Print</button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-[15px]">
+                <thead class="border-y border-line"><tr>
+                    <th class="th">Patient</th><th class="th">System ID</th><th class="th">Level · AIS</th><th class="th">Visits</th><th class="th">Last assessment</th><th class="th">Version</th><th class="th">Total</th>
+                </tr></thead>
+                <tbody class="divide-y divide-line">
+                    @forelse ($patients as $p)
+                        @php $a = $p->latestAssessment; @endphp
+                        <tr class="hover:bg-slate-50">
+                            <td class="td"><a href="{{ route('patients.show', $p) }}">@include('partials.patient-cell')</a></td>
+                            <td class="td font-mono text-sm"><a href="{{ route('patients.show', $p) }}" class="hover:underline">{{ $p->system_id }}</a></td>
+                            <td class="td">{{ $a?->nli?->value ?? $p->first_nli?->value ?? '—' }} · AIS {{ $a?->ais?->value ?? $p->first_ais?->value ?? '—' }}</td>
+                            <td class="td tabular-nums">{{ $p->assessments_count }}</td>
+                            <td class="td">{{ $a?->assessed_on->format('j M Y') ?? '—' }}</td>
+                            <td class="td">@include('partials.version-pill', ['version' => $a?->scim_version])</td>
+                            <td class="td font-bold tabular-nums">{{ $a?->result?->total ?? '—' }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="7" class="td py-10 text-center text-slate-500">{{ array_filter($filters) ? 'No matching patients.' : 'No patients yet.' }}</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
     <div class="mt-4">{{ $patients->links() }}</div>
 @endsection

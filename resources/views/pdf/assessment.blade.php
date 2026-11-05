@@ -15,7 +15,7 @@
         Patient {{ $assessment->patient->system_id }} · Research ID {{ $assessment->patient->research_id }} ·
         {{ $assessment->is_first ? 'First assessment' : 'Follow-up assessment' }}
     @else
-        Quick assessment (not linked to a patient)
+        Quick assessment · patient code {{ $assessment->patient_code ?? '—' }}
     @endif
 </p>
 
@@ -24,6 +24,7 @@
         <th>Gender / age</th><td>{{ $assessment->gender->label() }}, {{ $assessment->age }} y</td></tr>
     <tr><th>Neurological level</th><td>{{ $assessment->nli?->value ?? '—' }}</td>
         <th>AIS / AMS</th><td>{{ $assessment->ais?->value ?? '—' }} / {{ $assessment->ams ?? '—' }}</td></tr>
+    @if ($assessment->etiology)<tr><th>Etiology</th><td colspan="3">{{ $assessment->etiology->label() }}</td></tr>@endif
 </table>
 
 <h2>Result</h2>

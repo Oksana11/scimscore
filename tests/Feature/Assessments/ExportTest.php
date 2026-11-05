@@ -3,6 +3,7 @@
 namespace Tests\Feature\Assessments;
 
 use App\Models\Assessment;
+use App\Models\Institution;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -113,9 +114,11 @@ class ExportTest extends TestCase
     public function test_quick_assessment_exports_only_in_creating_session(): void
     {
         $answers = array_combine(array_map(fn ($i) => 'v'.$i, range(1, 19)), array_fill(0, 19, 0));
+        $inst = Institution::factory()->create();
+        $this->withSession(['quick.caregiver' => ['profession_id' => $this->user->profile->profession_id, 'country_code' => 'IL', 'institution_id' => $inst->id, 'institution_display' => $inst->name]]);
         $this->post('/quick', [
-            'scim_version' => 'III', 'assessed_on' => now()->toDateString(), 'gender' => 2, 'age' => 30,
-            'nli' => 'C5', 'ais' => 'B', 'answers' => $answers, 'accept_terms' => '1',
+            'scim_version' => 'III', 'assessed_on' => now()->toDateString(), 'gender' => 2, 'age' => 30, 'ams' => 40,
+            'patient_code' => 'Q-1', 'nli' => 'C5', 'ais' => 'B', 'answers' => $answers, 'accept_terms' => '1',
         ])->assertRedirect();
         $id = Assessment::query()->sole()->public_id;
 

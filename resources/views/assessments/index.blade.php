@@ -1,26 +1,27 @@
-@extends('layouts.app')
+@extends('layouts.account')
 
 @section('title', 'Assessment history')
+@section('breadcrumb', 'History')
 
 @section('content')
     @php $sel = fn ($k) => $filters[$k] ?? ''; $qs = request()->query(); @endphp
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-semibold">Assessment history</h1>
-            <p class="text-sm text-slate-600">Filter your data and export it for SPSS or any other research tool.</p>
+            <h1 class="page-title">Assessment history</h1>
+            <p class="page-sub">Filter your data and export it for SPSS or any other research tool.</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('assessments.export.xlsx', $qs) }}" class="btn-secondary">Export Excel</a>
-            <a href="{{ route('assessments.export.pdf', $qs) }}" class="btn-secondary">Export PDF</a>
+            <a href="{{ route('assessments.export.xlsx', $qs) }}" class="btn-secondary text-green-700"><x-icon name="sheet" class="size-4" /> Excel</a>
+            <a href="{{ route('assessments.export.pdf', $qs) }}" class="btn-secondary text-orange-700"><x-icon name="file" class="size-4" /> PDF</a>
         </div>
     </div>
     @error('export') <div class="alert-error mt-4" role="alert">{{ $message }}</div> @enderror
 
     <details class="card mt-6" @if ($filtered) open @endif>
-        <summary class="cursor-pointer font-semibold">Filters @if ($filtered)<span class="ml-2 text-sm font-normal text-blue-700">active</span>@endif</summary>
+        <summary class="section-title cursor-pointer">Filters @if ($filtered)<span class="ml-2 text-sm font-normal text-blue-700">active</span>@endif</summary>
         <form method="GET" action="{{ route('assessments.index') }}" class="mt-4 space-y-5">
             <fieldset>
-                <legend class="text-sm font-semibold tracking-wide text-slate-500 uppercase">Patient details</legend>
+                <legend class="text-xs font-semibold tracking-wider text-slate-500 uppercase">Patient details</legend>
                 <div class="mt-2 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
                     <div>
                         <label class="label" for="f_gender">Gender</label>
@@ -55,7 +56,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend class="text-sm font-semibold tracking-wide text-slate-500 uppercase">Assessment details</legend>
+                <legend class="text-xs font-semibold tracking-wider text-slate-500 uppercase">Assessment details</legend>
                 <div class="mt-2 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
                     <div>
                         <label class="label" for="f_ver">SCIM version</label>
@@ -109,28 +110,28 @@
     <p class="mt-4 text-sm text-slate-600">{{ $assessments->total() }} assessments</p>
 
     <div class="card mt-2 overflow-x-auto p-0">
-        <table class="w-full text-sm">
-            <thead class="border-b border-slate-200 text-left text-slate-500">
+        <table class="w-full text-[15px]">
+            <thead class="border-b border-line">
                 <tr>
-                    <th class="px-4 py-3 font-medium">Date</th>
-                    <th class="px-4 py-3 font-medium">Patient</th>
-                    <th class="px-4 py-3 font-medium">Version</th>
-                    <th class="px-4 py-3 font-medium">Level · AIS</th>
-                    <th class="px-4 py-3 text-right font-medium">Total</th>
-                    <th class="px-4 py-3 text-right font-medium">SCI-ARMI</th>
-                    <th class="px-4 py-3 font-medium">Grade</th>
+                    <th class="th">Date</th>
+                    <th class="th">Patient</th>
+                    <th class="th">Version</th>
+                    <th class="th">Level · AIS</th>
+                    <th class="th">Total</th>
+                    <th class="th">SCI-ARMI</th>
+                    <th class="th">Grade</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100">
+            <tbody class="divide-y divide-line">
                 @forelse ($assessments as $a)
                     <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3"><a class="btn-link" href="{{ route('assessments.show', $a) }}">{{ $a->assessed_on->format('d M Y') }}</a></td>
-                        <td class="px-4 py-3"><a class="btn-link" href="{{ route('patients.show', $a->patient->public_id) }}">{{ $a->patient->system_id }}</a> · {{ $a->patient->research_id }}</td>
-                        <td class="px-4 py-3">SCIM {{ $a->scim_version->value }}</td>
-                        <td class="px-4 py-3">{{ $a->nli?->value }} · {{ $a->ais?->value }}</td>
-                        <td class="px-4 py-3 text-right font-semibold tabular-nums">{{ $a->result->total }}</td>
-                        <td class="px-4 py-3 text-right tabular-nums">{{ $a->result->sciarmi_total ?? '—' }}</td>
-                        <td class="px-4 py-3">{{ $a->result->grade ?? '—' }}</td>
+                        <td class="td"><a class="btn-link" href="{{ route('assessments.show', $a) }}">{{ $a->assessed_on->format('d M Y') }}</a></td>
+                        <td class="td"><a class="btn-link" href="{{ route('patients.show', $a->patient->public_id) }}">{{ $a->patient->system_id }}</a> · {{ $a->patient->research_id }}</td>
+                        <td class="td">@include('partials.version-pill', ['version' => $a->scim_version])</td>
+                        <td class="td">{{ $a->nli?->value }} · {{ $a->ais?->value }}</td>
+                        <td class="td font-bold tabular-nums">{{ $a->result->total }}</td>
+                        <td class="td tabular-nums">{{ $a->result->sciarmi_total ?? '—' }}</td>
+                        <td class="td">{{ $a->result->grade ?? '—' }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="7" class="px-4 py-8 text-center text-slate-500">{{ $filtered ? 'No assessments match the filters.' : 'No assessments yet.' }}</td></tr>

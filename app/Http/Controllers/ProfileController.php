@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CaregiverRequest;
 use App\Models\Country;
 use App\Models\Profession;
 use App\Services\Auth\EmailChangeService;
@@ -9,7 +10,6 @@ use App\Services\Institutions\InstitutionResolver;
 use App\Support\Security\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -26,27 +26,18 @@ class ProfileController extends Controller
             return redirect()->route('profile.edit');
         }
 
-        return view('profile.edit', $this->formData($request) + ['firstTime' => true]);
+        return view('profile.complete', $this->formData($request));
     }
 
     public function edit(Request $request): View
     {
-        return view('profile.edit', $this->formData($request) + ['firstTime' => false]);
+        return view('profile.edit', $this->formData($request));
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(CaregiverRequest $request): RedirectResponse
     {
         $user = $request->user();
-
-        $data = $request->validate([
-            'profession_id' => ['required', 'integer', Rule::exists('professions', 'id')->where('is_active', true)],
-            'country_code' => ['required', 'string', 'size:2', Rule::exists('countries', 'code')->where('is_active', true)],
-            'institution' => ['required', 'string', 'max:40', 'regex:/^(local:\d+|ror:0[a-z0-9]{6}[0-9]{2}|custom)$/'],
-            'institution_custom_name' => ['nullable', 'required_if:institution,custom', 'string', 'min:3', 'max:255'],
-            'professional_title' => ['nullable', 'string', 'max:100'],
-            'organization' => ['nullable', 'string', 'max:255'],
-            'department' => ['nullable', 'string', 'max:255'],
-        ]);
+        $data = $request->validated();
 
         $institution = $this->institutions->resolve($data['institution'], $data['institution_custom_name'] ?? null, $data['country_code'], $user);
 
@@ -79,9 +70,20 @@ class ProfileController extends Controller
     {
         $user = $request->user()->load('profile.institution');
 
+        $p = $user->profile;
+
         return [
             'user' => $user,
-            'profile' => $user->profile,
+            'profile' => $p,
+            'values' => $p ? [
+                'profession_id' => $p->profession_id,
+                'country_code' => $p->country_code,
+                'institution' => 'local:'.$p->institution_id,
+                'institution_display' => $p->institution?->name,
+                'professional_title' => $p->professional_title,
+                'organization' => $p->organization,
+                'department' => $p->department,
+            ] : [],
             'professions' => Profession::query()->active()->get(['id', 'name']),
             'countries' => Country::query()->active()->orderBy('name')->get(['code', 'name']),
             'pendingEmail' => $this->emailChange->pending($user),

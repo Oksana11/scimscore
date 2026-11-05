@@ -62,7 +62,7 @@ final class InstitutionResolver
     /**
      * @return Institution|null null when the reference is invalid
      */
-    public function resolve(string $ref, ?string $customName, string $countryCode, User $user): ?Institution
+    public function resolve(string $ref, ?string $customName, string $countryCode, ?User $user = null): ?Institution
     {
         if (preg_match('/^local:(\d+)$/', $ref, $m)) {
             $institution = Institution::query()->find((int) $m[1]);
@@ -106,7 +106,7 @@ final class InstitutionResolver
                     'name' => mb_substr($name, 0, 255),
                     'country_code' => $countryCode,
                     'is_custom' => true,
-                    'created_by_user_id' => $user->id,
+                    'created_by_user_id' => $user?->id,
                 ]);
             });
         }

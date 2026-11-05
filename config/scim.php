@@ -6,6 +6,8 @@ return [
     | Version of the Terms of Use. Changing it asks users to accept again
     | (a new user_consents row is stored with the date and time).
     */
+    'support_email' => env('SCIM_SUPPORT_EMAIL', 'support@scimscore.org'),
+
     'terms_version' => env('SCIM_TERMS_VERSION', '2026-11'),
 
     'otp' => [

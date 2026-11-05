@@ -42,6 +42,9 @@ final class AdminStatistics
                 ->join('user_profiles', 'user_profiles.user_id', '=', 'users.id')
                 ->join('professions', 'professions.id', '=', 'user_profiles.profession_id')
                 ->groupBy('professions.name')->selectRaw('professions.name as label, count(*) as c')),
+            'Quick assessments by caregiver country' => $this->rows($assessments()->where('source', 'quick')->whereNotNull('caregiver_country_code')
+                ->join('countries', 'countries.code', '=', 'assessments.caregiver_country_code')
+                ->groupBy('countries.name')->selectRaw('countries.name as label, count(*) as c')),
             'Assessments by SCIM version' => $this->rows($assessments()->groupBy('scim_version')->selectRaw('scim_version as label, count(*) as c'), map: fn ($v) => 'SCIM '.$v),
             'Assessments by source' => $this->rows($assessments()->groupBy('source')->selectRaw('source as label, count(*) as c')),
             self::PERIOD => $this->periods($assessments(), $f['period'] ?? 'yearly'),

@@ -1,49 +1,28 @@
+{{-- Public layout: landing, sign-in, quick assessment, terms. --}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="noindex, nofollow">
-    <title>@hasSection('title')@yield('title') · @endif SCIMSCORE</title>
-    @fonts
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.head')
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
-    <header class="border-b border-slate-200 bg-white">
-        <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-            <a href="{{ route('home') }}" class="font-semibold tracking-tight">
-                SCIMSCORE <span class="hidden text-sm font-normal text-slate-500 sm:inline">Spinal Cord Independence Measure</span>
-            </a>
-            <nav class="flex items-center gap-4 text-sm">
-                @auth
-                    @if (auth()->user()->profile)
-                        <a href="{{ route('dashboard') }}" class="hover:underline">Dashboard</a>
-                        <a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a>
-                        <a href="{{ route('assessments.index') }}" class="hover:underline">History</a>
-                        <a href="{{ route('profile.edit') }}" class="hover:underline">Profile</a>
-                    @endif
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn-secondary py-1.5">Sign out</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="btn-primary py-1.5">Sign in</a>
-                @endauth
-            </nav>
+<body class="flex min-h-screen flex-col">
+    <header class="border-b border-line bg-white print:hidden">
+        <div class="flex items-center justify-between gap-4 px-6 py-3 sm:px-9">
+            <x-logo />
+            @auth
+                <a href="{{ auth()->user()->profile ? route('dashboard') : route('profile.complete') }}" class="btn-secondary">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}" class="btn-secondary">Sign in</a>
+            @endauth
         </div>
     </header>
 
-    <main class="mx-auto max-w-5xl px-4 py-10">
+    <main class="w-full flex-1 px-4 py-8 sm:px-6">
         @if (session('status'))
-            <div class="alert-success mb-6" role="status">{{ session('status') }}</div>
+            <div class="alert-success mx-auto mb-6 max-w-3xl" role="status">{{ session('status') }}</div>
         @endif
-
         @yield('content')
     </main>
 
-    <footer class="mx-auto max-w-5xl px-4 pb-10 text-xs text-slate-500">
-        © {{ date('Y') }} SCIMSCORE · Loewenstein Rehabilitation Medical Center ·
-        <a href="{{ route('terms') }}" class="underline">Terms of Use</a>
-    </footer>
+    <div class="print:hidden">@include('partials.footer')</div>
 </body>
 </html>

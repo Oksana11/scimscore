@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Anonymous patient. No names, national IDs, phones, addresses or emails.
@@ -82,5 +83,19 @@ class Patient extends Model
     public function assessments(): HasMany
     {
         return $this->hasMany(Assessment::class);
+    }
+
+    /** @return HasOne<Assessment, $this> */
+    public function latestAssessment(): HasOne
+    {
+        return $this->hasOne(Assessment::class)->ofMany(['assessed_on' => 'max', 'id' => 'max']);
+    }
+
+    /** Initials for the avatar, from the internal alias (e.g. "J.D." → "JD"). */
+    public function initials(): string
+    {
+        $letters = preg_replace('/[^\p{L}\p{N}]/u', '', (string) $this->alias) ?? '';
+
+        return mb_strtoupper(mb_substr($letters, 0, 2)) ?: '#';
     }
 }

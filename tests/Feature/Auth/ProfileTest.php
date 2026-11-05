@@ -99,9 +99,9 @@ class ProfileTest extends TestCase
         $this->assertSame('ror:04mhzgx49', $res->json('ror.0.ref'));
     }
 
-    public function test_institution_search_requires_login(): void
+    public function test_institution_search_is_available_to_guests_for_quick_assessment(): void
     {
-        $this->getJson('/institutions/search?q=Tel')->assertUnauthorized();
+        $this->getJson('/institutions/search?q=Tel Aviv')->assertOk()->assertJsonPath('ror.0.ref', 'ror:04mhzgx49');
     }
 
     public function test_email_change_flow(): void

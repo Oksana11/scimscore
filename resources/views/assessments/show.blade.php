@@ -1,37 +1,33 @@
-@extends('layouts.app')
+@extends('layouts.account')
 
 @section('title', 'Assessment')
+@section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / {{ $assessment->patient->system_id }} / Result@endsection
 
 @section('content')
-    <div class="mx-auto max-w-3xl space-y-6">
-        <a href="{{ route('patients.show', $assessment->patient) }}" class="btn-link print:hidden">‹ {{ $assessment->patient->system_id }}</a>
+    <div class="space-y-5">
+        <a href="{{ route('patients.show', $assessment->patient) }}" class="back-link print:hidden"><x-icon name="chevron-left" class="size-4" /> {{ $assessment->patient->system_id }}</a>
 
-        <div class="card">
-            <div class="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                    <h1 class="text-xl font-semibold">SCIM {{ $assessment->scim_version->value }} assessment</h1>
-                    <p class="mt-1 text-sm text-slate-600">
-                        {{ $assessment->patient->system_id }} · Research ID <strong>{{ $assessment->patient->research_id }}</strong> · {{ $assessment->patient->alias }}
-                        @if ($assessment->is_first) · <span class="text-violet-700">First assessment</span>@endif
-                    </p>
-                </div>
-                <div class="flex gap-2 print:hidden">
-                    <button type="button" class="btn-secondary" data-print>Print</button>
-                    <a href="{{ route('assessments.pdf', $assessment) }}" class="btn-secondary">PDF</a>
-                    <a href="{{ route('assessments.xlsx', $assessment) }}" class="btn-secondary">Excel</a>
-                    <form method="POST" action="{{ route('assessments.email', $assessment) }}">
-                        @csrf
-                        <button type="submit" class="btn-secondary">Email to me</button>
-                    </form>
-                </div>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <h1 class="page-title">SCIM {{ $assessment->scim_version->value }} result</h1>
+                <p class="page-sub">
+                    {{ $assessment->patient->alias }} · <span class="font-mono">{{ $assessment->patient->research_id }}</span> · {{ $assessment->assessed_on->format('j M Y') }}
+                    · {{ $assessment->is_first ? 'First assessment' : 'Follow-up' }}
+                </p>
             </div>
-            <div class="mt-6">@include('assessments._result')</div>
+            <div class="flex flex-wrap gap-2 print:hidden">
+                <button type="button" class="btn-secondary" data-print><x-icon name="print" class="size-4" /> Print</button>
+                <a href="{{ route('assessments.pdf', $assessment) }}" class="btn-secondary text-orange-700"><x-icon name="file" class="size-4" /> PDF</a>
+                <a href="{{ route('assessments.xlsx', $assessment) }}" class="btn-secondary text-green-700"><x-icon name="sheet" class="size-4" /> Excel</a>
+                <form method="POST" action="{{ route('assessments.email', $assessment) }}">@csrf
+                    <button type="submit" class="btn-secondary"><x-icon name="mail" class="size-4" /> Email to me</button>
+                </form>
+            </div>
         </div>
 
-        <div class="card">
-            <h2 class="font-semibold">Answers</h2>
-            <div class="mt-4">@include('assessments._answers')</div>
-            <p class="mt-4 text-xs text-slate-500">Saved assessments cannot be changed. Algorithm {{ $assessment->calc_version }}.</p>
-        </div>
+        @include('assessments._result')
+        @include('assessments._answers')
+
+        <p class="text-sm text-slate-500">Saved assessments cannot be changed · algorithm {{ $assessment->calc_version }}</p>
     </div>
 @endsection

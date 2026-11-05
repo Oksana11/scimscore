@@ -3,9 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Enums\AisGrade;
+use App\Enums\Etiology;
 use App\Enums\Gender;
 use App\Enums\NeurologicalLevel;
 use App\Enums\ScimVersion;
+use App\Rules\NotIdentifying;
 use App\Scoring\ScimDefinition;
 use App\Services\Assessments\PatientSnapshot;
 use Illuminate\Foundation\Http\FormRequest;
@@ -31,9 +33,11 @@ class QuickAssessmentRequest extends FormRequest
         return [
             'scim_version' => ['required', Rule::in($available)],
             'assessed_on' => ['required', 'date_format:Y-m-d', 'before_or_equal:today', 'after:2000-01-01'],
+            'patient_code' => ['required', 'string', 'min:1', 'max:50', new NotIdentifying],
             'gender' => ['required', Rule::enum(Gender::class)],
             'age' => ['required', 'integer', 'between:0,120'],
-            'ams' => ['nullable', 'integer', 'between:0,100'],
+            'ams' => ['required', 'integer', 'between:0,100'],
+            'etiology' => ['nullable', Rule::enum(Etiology::class)],
             'nli' => ['required', Rule::enum(NeurologicalLevel::class)],
             'ais' => ['required', Rule::enum(AisGrade::class)],
             'answers' => ['required', 'array'],
@@ -72,6 +76,24 @@ class QuickAssessmentRequest extends FormRequest
     public function assessedOn(): Carbon
     {
         return Carbon::createFromFormat('Y-m-d', $this->validated('assessed_on'))->startOfDay();
+    }
+
+    /**
+     * @param  array<string, mixed>  $caregiver  from the session (step 1)
+     * @return array<string, mixed>
+     */
+    public function details(array $caregiver): array
+    {
+        return [
+            'caregiver_profession_id' => $caregiver['profession_id'] ?? null,
+            'caregiver_country_code' => $caregiver['country_code'] ?? null,
+            'caregiver_institution_id' => $caregiver['institution_id'] ?? null,
+            'caregiver_title' => $caregiver['professional_title'] ?? null,
+            'caregiver_organization' => $caregiver['organization'] ?? null,
+            'caregiver_department' => $caregiver['department'] ?? null,
+            'patient_code' => trim((string) $this->validated('patient_code')),
+            'etiology' => Etiology::tryFrom((string) $this->validated('etiology')),
+        ];
     }
 
     /**
