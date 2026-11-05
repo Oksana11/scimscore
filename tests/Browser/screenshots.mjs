@@ -49,7 +49,7 @@ for (const name of await page.$$eval('input[type=radio][name^="answers"]', (els)
 await page.check('input[name=accept_terms]');
 await shot('04-quick-form-filled');
 await page.click('form button[type=submit]');
-await page.waitForURL(/\/quick\/[0-9A-Z]{26}$/);
+await page.waitForURL(/\/quick\/[0-9a-z]{26}$/i);
 await shot('05-quick-result');
 
 // Sign in (code from the log mailer)
@@ -85,7 +85,7 @@ for (const pick of [1, 2]) {
     }
     await page.check('input[name=accept_terms]');
     await page.click('form button[type=submit]');
-    await page.waitForURL(/\/assessments\/[0-9A-Z]{26}$/);
+    await page.waitForURL(/\/assessments\/[0-9a-z]{26}$/i);
     if (pick === 1) await shot('13-assessment-result');
 }
 await page.goto(createUrl.replace(/\/assessments\/create.*/, '')); await shot('14-patient-card');
