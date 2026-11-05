@@ -152,7 +152,7 @@ class PatientFlowTest extends TestCase
         $this->actingAs($user);
         $this->get('/patients')->assertOk()->assertSee('ABC123')->assertSee('XYZ999')->assertDontSee('OTHER1');
         $this->get('/patients?research_id=abc123')->assertSee('ABC123')->assertDontSee('XYZ999');
-        $this->get('/patients?research_id=OTHER1')->assertDontSee('OTHER1');
+        $this->get('/patients?research_id=OTHER1')->assertSee('No matching patients.')->assertDontSee('O.T.');
     }
 
     public function test_identifiers_that_look_like_email_or_id_numbers_are_rejected(): void
@@ -183,7 +183,7 @@ class PatientFlowTest extends TestCase
         Patient::factory()->for($colleague)->create(['research_id' => 'JD1985', 'alias' => 'Secret']);
         $user = $this->doctor($inst);
 
-        $res = $this->actingAs($user)->post('/patients', $this->patientForm());
+        $res = $this->actingAs($user)->from('/patients/create')->post('/patients', $this->patientForm());
         $res->assertSessionHasErrors('research_id');
         $this->assertSame(1, Patient::query()->count());
 
@@ -221,7 +221,7 @@ class PatientFlowTest extends TestCase
         Assessment::factory()->forPatient($theirs)->create(['nli' => 'T4', 'ais' => 'A', 'ams' => 50]);
         $user = $this->doctor($inst);
 
-        $res = $this->actingAs($user)->post('/patients', $this->patientForm());
+        $res = $this->actingAs($user)->from('/patients/create')->post('/patients', $this->patientForm());
         $this->assertSame(1, Patient::query()->count());
         $this->assertTrue(session('duplicate.institution'));
         $this->assertSame([], session('duplicate.similar_own'));
