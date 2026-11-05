@@ -23,8 +23,8 @@ const fail = async (e) => {
     await browser.close();
     process.exit(1);
 };
-process.on('unhandledRejection', fail);
 
+try {
 await page.goto(BASE); await shot('01-landing');
 
 // Quick assessment
@@ -98,5 +98,8 @@ await page.setViewportSize({ width: 390, height: 844 });
 await page.goto(`${BASE}/dashboard`); await shot('19-mobile-dashboard');
 await page.goto(BASE); await shot('20-mobile-landing');
 
+} catch (e) {
+    await fail(e);
+}
 console.log('console errors:', JSON.stringify(errors));
 await browser.close();
