@@ -25,9 +25,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Fillable([
     'source', 'user_id', 'patient_id', 'consent_id', 'scim_version', 'assessed_on', 'is_first',
     'gender', 'age', 'nli', 'ais', 'ams', 'answers', 'calc_version',
-    'access_token_hash', 'access_expires_at',
+    'access_token_hash', 'access_expires_at', 'legacy_ref',
 ])]
-#[Hidden(['access_token_hash'])]
+#[Hidden(['access_token_hash', 'legacy_ref'])]
 #[RouteKey('public_id')]
 class Assessment extends Model
 {

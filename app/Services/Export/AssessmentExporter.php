@@ -128,7 +128,7 @@ final class AssessmentExporter
         return array_merge($prefix, [
             $a->assessed_on->toDateString(),
             $a->scim_version->value,
-            $a->patient_id === null ? 'Quick' : ($a->is_first ? 'First' : 'Follow-up'),
+            $a->patient_id === null ? ucfirst($a->source->value) : ($a->is_first ? 'First' : 'Follow-up'),
             $a->gender->label(),
             $a->patient?->birth_year,
             $a->age,

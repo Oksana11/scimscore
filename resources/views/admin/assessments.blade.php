@@ -14,7 +14,7 @@
     </div>
 
     <form method="GET" class="card mt-6 grid gap-4 sm:grid-cols-4 lg:grid-cols-8">
-        <div><label class="label" for="src">Source</label><select id="src" name="source" class="input"><option value="">Any</option><option value="account" @selected($sel('source') === 'account')>Account</option><option value="quick" @selected($sel('source') === 'quick')>Quick</option></select></div>
+        <div><label class="label" for="src">Source</label><select id="src" name="source" class="input"><option value="">Any</option><option value="account" @selected($sel('source') === 'account')>Account</option><option value="quick" @selected($sel('source') === 'quick')>Quick</option><option value="legacy" @selected($sel('source') === 'legacy')>Legacy (old site)</option></select></div>
         <div><label class="label" for="ctry">Country</label><select id="ctry" name="country" class="input"><option value="">Any</option>@foreach ($countries as $c)<option value="{{ $c->code }}" @selected($sel('country') === $c->code)>{{ $c->name }}</option>@endforeach</select></div>
         <div><label class="label" for="ver">Version</label><select id="ver" name="version" class="input"><option value="">Any</option>@foreach ($versions as $v)<option value="{{ $v->value }}" @selected($sel('version') === $v->value)>SCIM {{ $v->value }}</option>@endforeach</select></div>
         <div><label class="label" for="gen">Gender</label><select id="gen" name="gender" class="input"><option value="">Any</option>@foreach ($genders as $g)<option value="{{ $g->value }}" @selected((string) $sel('gender') === (string) $g->value)>{{ $g->label() }}</option>@endforeach</select></div>
