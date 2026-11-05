@@ -17,6 +17,8 @@
                 </div>
                 <div class="flex gap-2 print:hidden">
                     <button type="button" class="btn-secondary" data-print>Print</button>
+                    <a href="{{ route('assessments.pdf', $assessment) }}" class="btn-secondary">PDF</a>
+                    <a href="{{ route('assessments.xlsx', $assessment) }}" class="btn-secondary">Excel</a>
                     <form method="POST" action="{{ route('assessments.email', $assessment) }}">
                         @csrf
                         <button type="submit" class="btn-secondary">Email to me</button>

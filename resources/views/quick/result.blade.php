@@ -7,7 +7,11 @@
         <div class="card">
             <div class="flex items-start justify-between gap-4">
                 <h1 class="text-xl font-semibold">Assessment result</h1>
-                <button type="button" class="btn-secondary print:hidden" data-print>Print</button>
+                <div class="flex gap-2 print:hidden">
+                    <button type="button" class="btn-secondary" data-print>Print</button>
+                    <a href="{{ route('quick.pdf', $assessment) }}" class="btn-secondary">PDF</a>
+                    <a href="{{ route('quick.xlsx', $assessment) }}" class="btn-secondary">Excel</a>
+                </div>
             </div>
             <div class="mt-6">
                 @include('assessments._result')

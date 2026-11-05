@@ -65,6 +65,8 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('result-email', fn (Request $request) => Limit::perHour(20)->by('result-email:'.($request->user()?->id ?? $request->ip())));
 
+        RateLimiter::for('export', fn (Request $request) => Limit::perHour(60)->by('export:'.($request->user()?->id ?? $request->ip())));
+
         RateLimiter::for('quick-assessment', fn (Request $request) => Limit::perHour(60)->by('quick:'.$request->ip()));
 
         RateLimiter::for('institution-search', fn (Request $request) => Limit::perMinute(60)->by('inst:'.($request->user()?->id ?? $request->ip())));

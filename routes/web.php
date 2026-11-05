@@ -22,6 +22,8 @@ Route::prefix('quick')->name('quick.')->controller(QuickAssessmentController::cl
     Route::post('/{assessment}/email', 'sendCode')->middleware('throttle:otp-send')->name('email.code');
     Route::post('/{assessment}/email/send', 'sendResult')->middleware('throttle:otp-verify')->name('email.send');
     Route::post('/{assessment}/email/change', 'changeEmail')->name('email.change');
+    Route::get('/{assessment}/pdf', 'pdf')->middleware('throttle:export')->name('pdf');
+    Route::get('/{assessment}/xlsx', 'xlsx')->middleware('throttle:export')->name('xlsx');
 });
 
 // --- Sign in / registration (email + one-time code) ---
@@ -52,7 +54,11 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/patients/{patient}/compare', [AssessmentController::class, 'compare'])->name('patients.compare');
 
         Route::get('/assessments', [AssessmentController::class, 'index'])->name('assessments.index');
+        Route::get('/assessments/export/xlsx', [AssessmentController::class, 'exportXlsx'])->middleware('throttle:export')->name('assessments.export.xlsx');
+        Route::get('/assessments/export/pdf', [AssessmentController::class, 'exportPdf'])->middleware('throttle:export')->name('assessments.export.pdf');
         Route::get('/assessments/{assessment}', [AssessmentController::class, 'show'])->name('assessments.show');
+        Route::get('/assessments/{assessment}/pdf', [AssessmentController::class, 'pdf'])->middleware('throttle:export')->name('assessments.pdf');
+        Route::get('/assessments/{assessment}/xlsx', [AssessmentController::class, 'xlsx'])->middleware('throttle:export')->name('assessments.xlsx');
         Route::post('/assessments/{assessment}/email', [AssessmentController::class, 'email'])->middleware('throttle:result-email')->name('assessments.email');
     });
 });

@@ -15,11 +15,14 @@ use App\Scoring\InvalidScimAnswers;
 use App\Scoring\ScimDefinition;
 use App\Services\Assessments\AssessmentRecorder;
 use App\Services\Auth\OtpService;
+use App\Services\Export\AssessmentExporter;
 use App\Support\Security\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Quick Assessment: one-time calculation without an account.
@@ -36,6 +39,7 @@ class QuickAssessmentController extends Controller
         private readonly AssessmentRecorder $recorder,
         private readonly OtpService $otp,
         private readonly AuditLogger $audit,
+        private readonly AssessmentExporter $exporter,
     ) {}
 
     public function create(Request $request): View
@@ -120,6 +124,20 @@ class QuickAssessmentController extends Controller
         $this->audit->log('assessment.quick_emailed', $assessment, anonymous: true);
 
         return redirect()->route('quick.result', $assessment)->with('status', __('The result has been sent to :email.', ['email' => $email]));
+    }
+
+    public function pdf(Request $request, Assessment $assessment): Response
+    {
+        $this->authorizeSession($request, $assessment);
+
+        return $this->exporter->pdf($assessment->load('result'), 'scim-quick-'.$assessment->assessed_on->format('Ymd').'.pdf');
+    }
+
+    public function xlsx(Request $request, Assessment $assessment): StreamedResponse
+    {
+        $this->authorizeSession($request, $assessment);
+
+        return $this->exporter->xlsx([$assessment->load('result')], 'scim-quick-'.$assessment->assessed_on->format('Ymd').'.xlsx', withPatient: false);
     }
 
     public function changeEmail(Request $request, Assessment $assessment): RedirectResponse
