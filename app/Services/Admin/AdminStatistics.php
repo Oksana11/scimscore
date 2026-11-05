@@ -3,18 +3,22 @@
 namespace App\Services\Admin;
 
 use App\Models\Assessment;
-use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Administrator breakdowns (spec, Appendix B): users by country / institution / profession,
- * assessments by SCIM version, patients by gender / year of birth / injury level / AIS,
+ * assessments by SCIM version, source, gender, age group, injury level, AIS,
  * and assessment counts per period. Aggregates only — no identifiers.
  */
 final class AdminStatistics
 {
+    private const AGE_GROUP = "CASE WHEN age < 20 THEN '0–19' WHEN age < 30 THEN '20–29' WHEN age < 40 THEN '30–39' WHEN age < 50 THEN '40–49' WHEN age < 60 THEN '50–59' WHEN age < 70 THEN '60–69' ELSE '70+' END";
+
+    /** Breakdown shown as a column chart over time (others are ranked lists). */
+    public const PERIOD = 'Assessments by period';
+
     /**
      * @param  array{date_from?: string|null, date_to?: string|null, period?: string|null}  $f
      * @return array<string, list<array{label: string, count: int}>>
@@ -40,9 +44,9 @@ final class AdminStatistics
                 ->groupBy('professions.name')->selectRaw('professions.name as label, count(*) as c')),
             'Assessments by SCIM version' => $this->rows($assessments()->groupBy('scim_version')->selectRaw('scim_version as label, count(*) as c'), map: fn ($v) => 'SCIM '.$v),
             'Assessments by source' => $this->rows($assessments()->groupBy('source')->selectRaw('source as label, count(*) as c')),
-            'Assessments by period' => $this->periods($assessments(), $f['period'] ?? 'monthly'),
-            'Patients by gender' => $this->rows(Patient::query()->groupBy('gender')->selectRaw('gender as label, count(*) as c'), map: fn ($v) => ((int) $v) === 1 ? 'Male' : 'Female'),
-            'Patients by decade of birth' => $this->rows(Patient::query()->groupByRaw('birth_year - (birth_year % 10)')->selectRaw('(birth_year - (birth_year % 10)) as label, count(*) as c'), map: fn ($v) => ((int) $v).'s', sortByLabel: true),
+            self::PERIOD => $this->periods($assessments(), $f['period'] ?? 'yearly'),
+            'Assessments by gender' => $this->rows($assessments()->groupBy('gender')->selectRaw('gender as label, count(*) as c'), map: fn ($v) => ((int) $v) === 1 ? 'Male' : 'Female'),
+            'Assessments by age group' => $this->rows($assessments()->groupByRaw(self::AGE_GROUP)->selectRaw(self::AGE_GROUP.' as label, count(*) as c'), sortByLabel: true),
             'Assessments by injury level' => $this->rows($assessments()->whereNotNull('nli')->groupBy('nli')->selectRaw('nli as label, count(*) as c')),
             'Assessments by AIS grade' => $this->rows($assessments()->whereNotNull('ais')->groupBy('ais')->selectRaw('ais as label, count(*) as c'), sortByLabel: true),
         ];

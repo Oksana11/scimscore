@@ -82,6 +82,6 @@ class DashboardController extends AdminController
             'period' => ['nullable', Rule::in(['daily', 'monthly', 'yearly'])],
         ]);
 
-        return ['date_from' => $v['date_from'] ?? null, 'date_to' => $v['date_to'] ?? null, 'period' => $v['period'] ?? 'monthly'];
+        return ['date_from' => $v['date_from'] ?? null, 'date_to' => $v['date_to'] ?? null, 'period' => $v['period'] ?? 'yearly'];
     }
 }
