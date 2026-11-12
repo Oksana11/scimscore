@@ -20,7 +20,9 @@ class SecurityHeaders
         $headers = $response->headers;
 
         $headers->set('X-Content-Type-Options', 'nosniff');
-        $headers->set('X-Frame-Options', 'DENY');
+        // Admin email previews are shown in a sandboxed same-origin iframe.
+        $emailPreview = $request->attributes->get('csp') === 'email-preview';
+        $headers->set('X-Frame-Options', $emailPreview ? 'SAMEORIGIN' : 'DENY');
         $headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
         $headers->set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -33,7 +35,10 @@ class SecurityHeaders
         $headers->set('Pragma', 'no-cache');
 
         if (config('security.headers.csp')) {
-            $headers->set('Content-Security-Policy', $this->csp($nonce, $request));
+            $headers->set('Content-Security-Policy', $emailPreview
+                // Email HTML needs inline styles; no scripts, no requests, no forms.
+                ? "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"
+                : $this->csp($nonce, $request));
         }
 
         if (config('security.headers.hsts') && $request->isSecure()) {

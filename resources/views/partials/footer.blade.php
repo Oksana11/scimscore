@@ -3,7 +3,7 @@
         <p>© {{ date('Y') }} SCIMSCORE · Loewenstein Rehabilitation Medical Center. All rights reserved.</p>
         <nav class="flex gap-6 font-semibold text-slate-700">
             <a href="{{ route('terms') }}" class="hover:text-ink">Terms of Use</a>
-            <a href="mailto:{{ config('scim.support_email') }}" class="hover:text-ink">Contact support</a>
+            <a href="mailto:{{ \App\Models\Setting::supportEmail() }}" class="hover:text-ink">Contact support</a>
         </nav>
     </div>
 </footer>

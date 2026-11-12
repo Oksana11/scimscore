@@ -24,6 +24,7 @@ export function initInstitutionPicker(root) {
     const choose = (value, name) => {
         ref.value = value;
         display.value = name;
+        ref.dispatchEvent(new Event('change', { bubbles: true }));
         search.value = name;
         custom.classList.toggle('hidden', value !== 'custom');
         if (value === 'custom') {

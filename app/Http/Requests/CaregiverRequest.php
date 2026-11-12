@@ -31,6 +31,22 @@ class CaregiverRequest extends FormRequest
      */
     public function messages(): array
     {
-        return ['institution.required' => 'Please choose an institution from the list or add a new one.'];
+        return [
+            'profession_id.required' => 'Please select your profession.',
+            'country_code.required' => 'Please select your country.',
+            'institution.required' => 'Please choose an institution from the list or add a new one.',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'profession_id' => 'profession',
+            'country_code' => 'country',
+            'institution_custom_name' => 'institution name',
+        ];
     }
 }
