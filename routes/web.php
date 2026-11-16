@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AuditController as AdminAuditController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DataController as AdminDataController;
+use App\Http\Controllers\Admin\EmailController as AdminEmailController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AssessmentController;
@@ -105,6 +106,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/settings/professions/{profession}/toggle', [AdminSettingsController::class, 'toggleProfession'])->name('professions.toggle');
         Route::post('/settings/institutions/{institution}/rename', [AdminSettingsController::class, 'renameInstitution'])->name('institutions.rename');
         Route::post('/settings/institutions/{institution}/merge', [AdminSettingsController::class, 'mergeInstitution'])->name('institutions.merge');
+
+        Route::get('/emails', [AdminEmailController::class, 'index'])->name('emails');
+        Route::post('/emails/settings', [AdminEmailController::class, 'updateSettings'])->name('emails.settings');
+        Route::pattern('key', '[a-z_]{1,64}');
+        Route::get('/emails/{key}', [AdminEmailController::class, 'edit'])->name('emails.edit');
+        Route::put('/emails/{key}', [AdminEmailController::class, 'update'])->name('emails.update');
+        Route::post('/emails/{key}/reset', [AdminEmailController::class, 'reset'])->name('emails.reset');
+        Route::get('/emails/{key}/preview', [AdminEmailController::class, 'preview'])->name('emails.preview');
+        Route::post('/emails/{key}/test', [AdminEmailController::class, 'test'])->middleware('throttle:result-email')->name('emails.test');
 
         Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit');
         Route::post('/audit/verify', [AdminAuditController::class, 'verify'])->name('audit.verify');

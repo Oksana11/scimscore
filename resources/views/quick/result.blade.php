@@ -10,24 +10,26 @@
         </div>
 
         <div class="flex flex-wrap items-start justify-between gap-4">
-            <div>
+            <div id="print-summary">
                 <h1 class="page-title">SCIM {{ $assessment->scim_version->value }} result</h1>
                 <p class="page-sub">Quick assessment · <span class="font-mono">{{ $assessment->patient_code }}</span> · {{ $assessment->assessed_on->format('j M Y') }}</p>
             </div>
             <div class="flex gap-2 print:hidden">
-                <button type="button" class="btn-secondary" data-print><x-icon name="print" class="size-4" /> Print</button>
+                <button type="button" class="btn-secondary" data-print="#print-summary, #print-results"><x-icon name="print" class="size-4" /> Print</button>
                 <a href="{{ route('quick.pdf', $assessment) }}" class="btn-secondary text-orange-700"><x-icon name="file" class="size-4" /> PDF</a>
                 <a href="{{ route('quick.xlsx', $assessment) }}" class="btn-secondary text-green-700"><x-icon name="sheet" class="size-4" /> Excel</a>
             </div>
         </div>
 
-        @include('assessments._result')
-        @include('assessments._answers')
+        <div id="print-results" class="space-y-5">
+            @include('assessments._result')
+            @include('assessments._answers')
 
-        <p class="text-sm text-slate-500">
+            <p class="text-sm text-slate-500">
             Caregiver: {{ $assessment->caregiverProfession?->name }} · {{ $assessment->caregiverCountry?->name }} · {{ $assessment->caregiverInstitution?->name }}
             · Terms of Use accepted {{ $assessment->consent->accepted_at->format('j M Y, H:i') }} UTC
-        </p>
+            </p>
+        </div>
 
         <section class="card print:hidden">
             <h2 class="section-title flex items-center gap-2"><x-icon name="mail" class="size-5 text-slate-400" /> Send the result by email</h2>

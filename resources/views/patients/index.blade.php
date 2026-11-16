@@ -31,10 +31,10 @@
     </form>
     <p class="mt-2 text-xs text-slate-500">Research ID and alias are matched exactly — they are stored encrypted.</p>
 
-    <section class="card mt-4 overflow-hidden p-0">
+    <section id="patients-table" class="card mt-4 overflow-hidden p-0">
         <div class="flex items-center justify-between px-5 py-3.5">
             <p class="text-[15px] text-slate-600">{{ $patients->total() }} patients</p>
-            <button type="button" class="btn-secondary py-1.5 print:hidden" data-print><x-icon name="print" class="size-4" /> Print</button>
+            <button type="button" class="btn-secondary py-1.5 print:hidden" data-print="#patients-table" data-print-title="My Patients"><x-icon name="print" class="size-4" /> Print</button>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-[15px]">

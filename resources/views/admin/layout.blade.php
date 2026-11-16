@@ -18,6 +18,7 @@
                     <a href="{{ route('admin.patients') }}" class="hover:underline">Patients</a>
                     <a href="{{ route('admin.assessments') }}" class="hover:underline">Assessments</a>
                     <a href="{{ route('admin.settings') }}" class="hover:underline">Settings</a>
+                    <a href="{{ route('admin.emails') }}" class="hover:underline">Emails</a>
                     <a href="{{ route('admin.audit') }}" class="hover:underline">Audit log</a>
                     <form method="POST" action="{{ route('admin.logout') }}">@csrf<button class="rounded border border-white/30 px-3 py-1 hover:bg-white/10">Sign out</button></form>
                 </nav>

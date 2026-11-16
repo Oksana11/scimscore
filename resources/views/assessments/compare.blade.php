@@ -21,8 +21,9 @@
         <a href="{{ route('patients.show', $patient) }}" class="back-link print:hidden"><x-icon name="chevron-left" class="size-4" /> {{ $patient->system_id }}</a>
         <div class="flex items-start justify-between gap-4">
             <h1 class="page-title">Compare assessments</h1>
-            <button type="button" class="btn-secondary print:hidden" data-print><x-icon name="print" class="size-4" /> Print</button>
+            <button type="button" class="btn-secondary print:hidden" data-print="#print-compare" data-print-title="Compare assessments"><x-icon name="print" class="size-4" /> Print</button>
         </div>
+        <div id="print-compare" class="space-y-6">
         <p class="page-sub">{{ $patient->system_id }} · Research ID <strong>{{ $patient->research_id }}</strong> · {{ $patient->alias }}</p>
 
         <div class="card overflow-x-auto p-0">
@@ -97,5 +98,6 @@
         @else
             <p class="text-sm text-slate-500">Item-by-item comparison is available for assessments of the same SCIM version.</p>
         @endif
+        </div>
     </div>
 @endsection
