@@ -10,10 +10,13 @@ use App\Enums\ScimVersion;
 use App\Mail\AssessmentResultMail;
 use App\Mail\EmailChangedMail;
 use App\Mail\OtpCodeMail;
+use App\Mail\SupportReplyMail;
 use App\Models\Assessment;
 use App\Models\AssessmentResult;
 use App\Models\EmailTemplate;
 use App\Models\Setting;
+use App\Models\SupportMessage;
+use App\Models\SupportReply;
 use App\Support\Mail\EmailTemplates;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -120,6 +123,10 @@ class EmailController extends AdminController
         return match ($key) {
             'email_changed' => new EmailChangedMail,
             'assessment_result' => new AssessmentResultMail($this->sampleAssessment()),
+            'support_reply' => new SupportReplyMail(
+                (new SupportMessage)->forceFill(['subject' => 'Example question', 'message' => "How do I export my assessments?\nThanks!", 'created_at' => now()]),
+                (new SupportReply)->forceFill(['body' => "Hello,\nOpen History and choose Excel or PDF.\nBest regards"]),
+            ),
         };
     }
 
