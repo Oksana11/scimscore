@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminsController as AdminAdminsController;
 use App\Http\Controllers\Admin\AuditController as AdminAuditController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DataController as AdminDataController;
@@ -106,6 +107,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/settings/professions/{profession}/toggle', [AdminSettingsController::class, 'toggleProfession'])->name('professions.toggle');
         Route::post('/settings/institutions/{institution}/rename', [AdminSettingsController::class, 'renameInstitution'])->name('institutions.rename');
         Route::post('/settings/institutions/{institution}/merge', [AdminSettingsController::class, 'mergeInstitution'])->name('institutions.merge');
+
+        Route::get('/admins', [AdminAdminsController::class, 'index'])->name('admins');
+        Route::post('/admins', [AdminAdminsController::class, 'store'])->name('admins.store');
+        Route::post('/admins/{admin}/toggle', [AdminAdminsController::class, 'toggle'])->name('admins.toggle');
+        Route::post('/admins/{admin}/reset-mfa', [AdminAdminsController::class, 'resetMfa'])->name('admins.reset-mfa');
 
         Route::get('/emails', [AdminEmailController::class, 'index'])->name('emails');
         Route::post('/emails/settings', [AdminEmailController::class, 'updateSettings'])->name('emails.settings');
