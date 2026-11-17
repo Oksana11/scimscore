@@ -23,6 +23,7 @@
                     <a href="{{ route('admin.settings') }}" class="hover:underline">Settings</a>
                     @php($newSupport = \App\Models\SupportMessage::query()->where('status', 'new')->count())
                     <a href="{{ route('admin.support') }}" class="hover:underline">Support @if ($newSupport)<span class="ml-0.5 rounded-full bg-amber-400 px-1.5 text-xs font-bold text-slate-900">{{ $newSupport }}</span>@endif</a>
+                    <a href="{{ route('admin.pages') }}" class="hover:underline">Pages</a>
                     <a href="{{ route('admin.emails') }}" class="hover:underline">Emails</a>
                     <a href="{{ route('admin.admins') }}" class="hover:underline">Admins</a>
                     <a href="{{ route('admin.audit') }}" class="hover:underline">Audit log</a>

@@ -8,11 +8,16 @@
     <header class="border-b border-line bg-white print:hidden">
         <div class="flex items-center justify-between gap-4 px-6 py-3 sm:px-9">
             <x-logo />
+            <div class="flex items-center gap-5">
+            @foreach (\App\Models\Page::menu('header') as $item)
+                <a href="{{ $item['url'] }}" class="hidden text-sm font-semibold text-slate-700 hover:text-ink sm:inline">{{ $item['title'] }}</a>
+            @endforeach
             @auth
                 <a href="{{ auth()->user()->profile ? route('dashboard') : route('profile.complete') }}" class="btn-secondary">Dashboard</a>
             @else
                 <a href="{{ route('login') }}" class="btn-secondary">Sign in</a>
             @endauth
+            </div>
         </div>
     </header>
 

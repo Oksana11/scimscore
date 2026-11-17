@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\OtpPurpose;
 use App\Http\Controllers\Controller;
+use App\Models\Page;
 use App\Models\User;
 use App\Models\UserConsent;
 use App\Services\Auth\OtpService;
@@ -100,7 +101,7 @@ class LoginController extends Controller
                 $this->audit->log('auth.registered', $user, actorType: 'user', actorId: $user->id);
             }
 
-            $version = (string) config('scim.terms_version');
+            $version = Page::termsVersion();
             if ($user->is_active && ! UserConsent::query()->where('user_id', $user->id)->where('terms_version', $version)->exists()) {
                 UserConsent::query()->create([
                     'user_id' => $user->id,
