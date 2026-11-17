@@ -12,8 +12,8 @@
             @foreach (\App\Models\Page::menu('header') as $item)
                 <a href="{{ $item['url'] }}" class="hidden text-sm font-semibold text-slate-700 hover:text-ink sm:inline">{{ $item['title'] }}</a>
             @endforeach
-            @auth
-                <a href="{{ auth()->user()->profile ? route('dashboard') : route('profile.complete') }}" class="btn-secondary">Dashboard</a>
+            @auth('web')
+                <a href="{{ auth('web')->user()->profile ? route('dashboard') : route('profile.complete') }}" class="btn-secondary">Dashboard</a>
             @else
                 <a href="{{ route('login') }}" class="btn-secondary">Sign in</a>
             @endauth
