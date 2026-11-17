@@ -5,6 +5,7 @@ namespace App\Services\Assessments;
 use App\Enums\AssessmentSource;
 use App\Enums\ScimVersion;
 use App\Models\Assessment;
+use App\Models\Page;
 use App\Models\Patient;
 use App\Models\User;
 use App\Models\UserConsent;
@@ -72,7 +73,7 @@ final class AssessmentRecorder
         $assessment = DB::transaction(function () use ($source, $version, $clean, $patient, $assessedOn, $user, $patientModel, $isFirst, $result, $details) {
             $consent = UserConsent::query()->create([
                 'user_id' => $source === AssessmentSource::Quick ? null : $user?->id,
-                'terms_version' => (string) config('scim.terms_version'),
+                'terms_version' => Page::termsVersion(),
                 'accepted_at' => now(),
             ]);
 
