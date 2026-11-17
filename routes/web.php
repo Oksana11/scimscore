@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DataController as AdminDataController;
 use App\Http\Controllers\Admin\EmailController as AdminEmailController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\SupportController as AdminSupportController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\Auth\LoginController;
@@ -17,10 +18,13 @@ use App\Http\Controllers\PatientAssessmentController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuickAssessmentController;
+use App\Http\Controllers\SupportController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
 Route::view('/terms', 'terms')->name('terms');
+Route::get('/support', [SupportController::class, 'create'])->name('support');
+Route::post('/support', [SupportController::class, 'store'])->middleware('throttle:support')->name('support.store');
 
 // Institution autocomplete (profile and Quick Assessment step 1): our DB + ROR, rate-limited.
 Route::get('/institutions/search', InstitutionSearchController::class)->middleware('throttle:institution-search')->name('institutions.search');
@@ -107,6 +111,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/settings/professions/{profession}/toggle', [AdminSettingsController::class, 'toggleProfession'])->name('professions.toggle');
         Route::post('/settings/institutions/{institution}/rename', [AdminSettingsController::class, 'renameInstitution'])->name('institutions.rename');
         Route::post('/settings/institutions/{institution}/merge', [AdminSettingsController::class, 'mergeInstitution'])->name('institutions.merge');
+
+        Route::get('/support', [AdminSupportController::class, 'index'])->name('support');
+        Route::get('/support/{message}', [AdminSupportController::class, 'show'])->name('support.show');
+        Route::post('/support/{message}/reply', [AdminSupportController::class, 'reply'])->middleware('throttle:result-email')->name('support.reply');
+        Route::post('/support/{message}/status', [AdminSupportController::class, 'status'])->name('support.status');
 
         Route::get('/admins', [AdminAdminsController::class, 'index'])->name('admins');
         Route::post('/admins', [AdminAdminsController::class, 'store'])->name('admins.store');

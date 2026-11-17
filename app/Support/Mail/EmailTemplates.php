@@ -71,6 +71,14 @@ final class EmailTemplates
                 'heading' => 'Your sign-in email was changed',
                 'body' => "The sign-in email of your SCIMSCORE account has been changed. This address will no longer receive sign-in codes.\nIf you did not make this change, contact support immediately: {support_email}",
             ],
+            'support_reply' => [
+                'label' => 'Support reply',
+                'description' => "Administrator's answer to a contact form message. Your reply and the original message are always included; this text goes below them.",
+                'placeholders' => $common,
+                'subject' => 'Re: your SCIMSCORE support request',
+                'heading' => 'Reply from SCIMSCORE support',
+                'body' => "If you have more questions, use the contact form on {site_url}/support or write to {support_email}.\nPlease never include patient-identifying information in your messages.",
+            ],
             'assessment_result' => [
                 'label' => 'Assessment result',
                 'description' => 'Text shown below the result table of an emailed SCIM assessment. The table is always included.',
@@ -151,7 +159,7 @@ final class EmailTemplates
      *
      * @return list<HtmlString>
      */
-    private static function paragraphs(string $text): array
+    public static function paragraphs(string $text): array
     {
         $out = [];
         foreach (preg_split('/\R/u', $text) ?: [] as $line) {
