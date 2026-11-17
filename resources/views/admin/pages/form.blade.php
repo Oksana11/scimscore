@@ -21,8 +21,8 @@
             </div>
             <div>
                 <label for="body" class="label">Content</label>
-                <textarea id="body" name="body" rows="20" class="input font-mono text-sm" maxlength="100000" required>{{ old('body', $page->body) }}</textarea>
-                <p class="hint">Markdown: empty line = new paragraph · <code>## Heading</code> · <code>**bold**</code> · <code>- list item</code> · <code>[link text](https://…)</code>. HTML is not allowed.</p>
+                <textarea id="body" name="body" rows="20" class="input font-mono text-sm" maxlength="100000" required data-editor data-upload-url="{{ route('admin.media.store') }}">{{ old('body', $page->body) }}</textarea>
+                <p class="hint">Images: JPG, PNG or WebP up to 5 MB. Links: https://, mailto: or site addresses.</p>
                 @error('body') <p class="field-error">{{ $message }}</p> @enderror
             </div>
         </section>

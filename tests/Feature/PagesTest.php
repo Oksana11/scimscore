@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\Page;
 use App\Support\Security\Totp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class PagesTest extends TestCase
@@ -84,5 +85,37 @@ class PagesTest extends TestCase
     {
         $this->get('/admin/pages')->assertRedirect('/admin/login');
         $this->post('/admin/pages', ['title' => 'X', 'slug' => 'x', 'body' => 'x'])->assertRedirect('/admin/login');
+    }
+
+    public function test_admin_uploads_image_which_is_reencoded_and_served(): void
+    {
+        $this->admin();
+
+        $img = imagecreatetruecolor(40, 30);
+        ob_start();
+        imagejpeg($img);
+        $jpeg = ob_get_clean();
+        $file = UploadedFile::fake()->createWithContent('photo.jpg', $jpeg.'<?php echo 1; ?>');
+
+        $res = $this->postJson('/admin/media', ['image' => $file])->assertOk();
+        $url = $res->json('url');
+        $this->assertMatchesRegularExpression('~/media/[a-f0-9]{32}\.jpg$~', $url);
+
+        $name = basename($url);
+        $stored = (string) file_get_contents(storage_path('app/media/'.$name));
+        $this->assertStringNotContainsString('<?php', $stored);
+
+        $this->get('/media/'.$name)->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
+        $this->get('/media/../.env')->assertNotFound();
+        @unlink(storage_path('app/media/'.$name));
+    }
+
+    public function test_non_images_and_guests_are_rejected(): void
+    {
+        $this->postJson('/admin/media', ['image' => UploadedFile::fake()->create('x.jpg', 10)])->assertUnauthorized();
+
+        $this->admin();
+        $this->postJson('/admin/media', ['image' => UploadedFile::fake()->createWithContent('x.jpg', 'not an image')])
+            ->assertUnprocessable();
     }
 }
