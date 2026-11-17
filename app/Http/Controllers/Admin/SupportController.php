@@ -47,6 +47,14 @@ class SupportController extends AdminController
         return back()->with('status', 'Reply sent to '.$message->email.'.');
     }
 
+    public function destroy(SupportMessage $message): RedirectResponse
+    {
+        $this->log('admin.support_deleted', $message);
+        $message->delete(); // replies are removed by the foreign key cascade
+
+        return redirect()->route('admin.support')->with('status', 'Message deleted.');
+    }
+
     public function status(Request $request, SupportMessage $message): RedirectResponse
     {
         $data = $request->validate(['status' => ['required', 'in:'.implode(',', SupportMessage::STATUSES)]]);

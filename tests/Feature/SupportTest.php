@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Mail\SupportReplyMail;
 use App\Models\Admin;
 use App\Models\SupportMessage;
+use App\Models\SupportReply;
 use App\Support\Security\Totp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -88,5 +89,16 @@ class SupportTest extends TestCase
 
         $this->get('/admin/support')->assertRedirect('/admin/login');
         $this->get("/admin/support/{$msg->public_id}")->assertRedirect('/admin/login');
+    }
+
+    public function test_admin_deletes_message_with_replies(): void
+    {
+        $msg = SupportMessage::query()->create(['email' => 'doc@example.com', 'subject' => 'Help', 'message' => 'Question']);
+        $msg->replies()->create(['body' => 'Answer']);
+        $this->admin();
+
+        $this->delete("/admin/support/{$msg->public_id}")->assertRedirect('/admin/support');
+        $this->assertSame(0, SupportMessage::query()->count());
+        $this->assertSame(0, SupportReply::query()->count());
     }
 }
