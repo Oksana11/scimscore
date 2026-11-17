@@ -8,6 +8,15 @@
             <h1 class="text-2xl font-semibold">{{ $message->subject }}</h1>
             <p class="mt-1 text-sm text-slate-500">{{ $message->email }} · {{ $message->created_at->format('Y-m-d H:i') }} @if ($message->user_id) · registered user @endif</p>
         </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="#reply" class="btn-primary">Reply</a>
+            <form method="POST" action="{{ route('admin.support.destroy', $message) }}" data-confirm="Delete this message and its replies?">@csrf @method('DELETE')
+                <button class="btn-secondary text-red-700">Delete</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-4">
         <form method="POST" action="{{ route('admin.support.status', $message) }}" class="flex items-center gap-2">@csrf
             <label for="status" class="text-sm text-slate-500">Status</label>
             <select id="status" name="status" class="input w-auto">
@@ -32,7 +41,8 @@
             </article>
         @endforeach
 
-        <section class="card">
+        <section id="reply" class="card scroll-mt-4">
+            <h2 class="mb-3 font-semibold">Reply</h2>
             <form method="POST" action="{{ route('admin.support.reply', $message) }}" class="space-y-3">@csrf
                 <label for="body" class="label">Reply by email to {{ $message->email }}</label>
                 <textarea id="body" name="body" rows="7" class="input" maxlength="10000" required>{{ old('body') }}</textarea>

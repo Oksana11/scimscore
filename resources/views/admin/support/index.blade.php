@@ -14,7 +14,7 @@
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-line text-left text-xs uppercase text-slate-500">
-                    <th class="px-4 py-3">Received</th><th class="px-4 py-3">From</th><th class="px-4 py-3">Subject</th><th class="px-4 py-3">Replies</th><th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Received</th><th class="px-4 py-3">From</th><th class="px-4 py-3">Subject</th><th class="px-4 py-3">Replies</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th>
                 </tr>
             </thead>
             <tbody>
@@ -25,9 +25,15 @@
                         <td class="px-4 py-3"><a href="{{ route('admin.support.show', $m) }}" class="text-brand hover:underline">{{ \Illuminate\Support\Str::limit($m->subject, 80) }}</a></td>
                         <td class="px-4 py-3">{{ $m->replies_count }}</td>
                         <td class="px-4 py-3 {{ ['new' => 'text-amber-700', 'answered' => 'text-green-700', 'closed' => 'text-slate-400'][$m->status] }}">{{ ucfirst($m->status) }}</td>
+                        <td class="px-4 py-3 text-right whitespace-nowrap">
+                            <a href="{{ route('admin.support.show', $m) }}#reply" class="btn-primary px-3 py-1.5 text-xs">Reply</a>
+                            <form method="POST" action="{{ route('admin.support.destroy', $m) }}" class="ml-1 inline" data-confirm="Delete this message and its replies?">@csrf @method('DELETE')
+                                <button class="btn-secondary px-3 py-1.5 text-xs text-red-700">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">No messages.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No messages.</td></tr>
                 @endforelse
             </tbody>
         </table>

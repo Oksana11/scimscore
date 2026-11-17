@@ -116,6 +116,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/support/{message}', [AdminSupportController::class, 'show'])->name('support.show');
         Route::post('/support/{message}/reply', [AdminSupportController::class, 'reply'])->middleware('throttle:result-email')->name('support.reply');
         Route::post('/support/{message}/status', [AdminSupportController::class, 'status'])->name('support.status');
+        Route::delete('/support/{message}', [AdminSupportController::class, 'destroy'])->name('support.destroy');
 
         Route::get('/admins', [AdminAdminsController::class, 'index'])->name('admins');
         Route::post('/admins', [AdminAdminsController::class, 'store'])->name('admins.store');
