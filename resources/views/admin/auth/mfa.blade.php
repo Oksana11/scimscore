@@ -6,12 +6,16 @@
         @if ($enrolling)
             <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm text-slate-700">
                 <li>Open an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password…).</li>
-                <li>Add an account manually with this key (time-based, 6 digits):
-                    <code class="mt-1 block rounded bg-slate-100 px-2 py-1 font-mono text-xs break-all select-all">{{ $secret }}</code>
+                <li>Scan this QR code:
+                    <canvas data-totp-qr="{{ $uri }}" class="mt-2 block rounded-lg border border-line" aria-label="QR code for the authenticator app"></canvas>
+                    <details class="mt-2 text-xs text-slate-500">
+                        <summary class="cursor-pointer">Can't scan? Enter the key manually</summary>
+                        <code class="mt-1 block rounded bg-slate-100 px-2 py-1 font-mono text-xs break-all select-all">{{ $secret }}</code>
+                        <span class="mt-1 block">Time-based, 6 digits.</span>
+                    </details>
                 </li>
                 <li>Enter the 6-digit code the app shows.</li>
             </ol>
-            <p class="mt-2 text-xs text-slate-500 break-all">Setup URI: {{ $uri }}</p>
         @else
             <p class="mt-1 text-sm text-slate-600">Step 2 of 2 — enter the 6-digit code from your authenticator app.</p>
         @endif
