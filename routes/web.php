@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AuditController as AdminAuditController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DataController as AdminDataController;
 use App\Http\Controllers\Admin\EmailController as AdminEmailController;
+use App\Http\Controllers\Admin\MediaController as AdminMediaController;
 use App\Http\Controllers\Admin\PagesController as AdminPagesController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\SupportController as AdminSupportController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailChangeController;
 use App\Http\Controllers\InstitutionSearchController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PatientAssessmentController;
 use App\Http\Controllers\PatientController;
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
+Route::get('/media/{file}', [MediaController::class, 'show'])->where('file', '[a-f0-9]{32}\\.(jpg|png)')->name('media');
 Route::get('/support', [SupportController::class, 'create'])->name('support');
 Route::post('/support', [SupportController::class, 'store'])->middleware('throttle:support')->name('support.store');
 
@@ -114,6 +117,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/settings/institutions/{institution}/rename', [AdminSettingsController::class, 'renameInstitution'])->name('institutions.rename');
         Route::post('/settings/institutions/{institution}/merge', [AdminSettingsController::class, 'mergeInstitution'])->name('institutions.merge');
 
+        Route::post('/media', [AdminMediaController::class, 'store'])->middleware('throttle:export')->name('media.store');
         Route::get('/pages', [AdminPagesController::class, 'index'])->name('pages');
         Route::get('/pages/create', [AdminPagesController::class, 'create'])->name('pages.create');
         Route::post('/pages', [AdminPagesController::class, 'store'])->name('pages.store');

@@ -46,7 +46,7 @@
 @utility avatar { @apply inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand; }
 
 /* Admin-edited page content (Markdown). */
-.page-content { font-size: 15px; line-height: 1.7; color: var(--color-slate-700); }
+.page-content { font-size: 15px; line-height: 1.7; color: #334155; }
 .page-content > * + * { margin-top: 1em; }
 .page-content h2 { margin-top: 1.6em; font-size: 1.25rem; font-weight: 700; color: var(--color-ink); }
 .page-content h3 { margin-top: 1.4em; font-size: 1.05rem; font-weight: 700; color: var(--color-ink); }
@@ -54,9 +54,18 @@
 .page-content ol { list-style: decimal; padding-left: 1.4em; }
 .page-content a { color: var(--color-brand); text-decoration: underline; }
 .page-content strong { color: var(--color-ink); }
-.page-content blockquote { border-left: 3px solid var(--color-line); padding-left: 1em; color: var(--color-slate-500); }
+.page-content blockquote { border-left: 3px solid var(--color-line); padding-left: 1em; color: #64748b; }
 .page-content table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .page-content th, .page-content td { border: 1px solid var(--color-line); padding: 6px 10px; text-align: left; }
+
+/* Page editor (resources/js/page-editor.js). Tiptap CSS injection is off for CSP. */
+.editor-btn { border-radius: 6px; padding: 4px 9px; font-size: 13px; color: #334155; }
+.editor-btn:hover { background: #f1f5f9; }
+.editor-btn.is-active { background: var(--color-brand-soft); color: var(--color-brand); }
+.ProseMirror { white-space: pre-wrap; word-wrap: break-word; }
+.ProseMirror img.ProseMirror-selectednode { outline: 3px solid var(--color-brand); }
+.page-content img { max-width: 100%; height: auto; border-radius: 10px; }
+.page-content hr { border: 0; border-top: 1px solid var(--color-line); }
 
 /* Live validation (resources/js/form-validation.js). */
 .input[aria-invalid='true'] { border-color: var(--color-red-500); }

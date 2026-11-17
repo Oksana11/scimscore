@@ -16,3 +16,9 @@ document.querySelectorAll('form[data-confirm]').forEach((f) =>
     }),
 );
 document.querySelectorAll('canvas[data-totp-qr]').forEach(initTotpQr);
+
+// The page editor is large: load it only on admin page forms.
+const pageEditor = document.querySelector('textarea[data-editor]');
+if (pageEditor) {
+    import('./page-editor').then(({ initPageEditor }) => initPageEditor(pageEditor));
+}
