@@ -1,0 +1,33 @@
+# SCIMSCORE on AWS (EC2 + RDS)
+
+Server: Ubuntu 24.04, nginx, PHP 8.3-FPM. Code comes from the `deploy` branch (built by CI
+on every merge to `main`, includes `vendor/` and `public/build/` — no Composer/Node on the server).
+
+## First install
+```bash
+sudo mkdir -p /var/www/scimscore && sudo chown ubuntu:www-data /var/www/scimscore
+git clone --branch deploy --single-branch https://github.com/Oksana11/scimscore.git /var/www/scimscore
+bash /var/www/scimscore/deploy/aws/setup.sh YOUR-DOMAIN
+```
+Create the database once (if it does not exist):
+```bash
+mysql -h <RDS host> -u scimscore -p --ssl-mode=VERIFY_IDENTITY --ssl-ca=/etc/ssl/rds/global-bundle.pem \
+  -e "CREATE DATABASE IF NOT EXISTS scimscore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+Create `.env`: `cp deploy/aws/env.example .env && nano .env` — fill DB_PASSWORD, MAIL_PASSWORD,
+APP_URL, TRUSTED_PROXIES. Then:
+```bash
+/var/www/scimscore/deploy/aws/first-run.sh admin@email AdminName
+```
+Back up APP_KEY, BLIND_INDEX_KEY and AUDIT_HMAC_KEY from `.env` to a password manager.
+
+## Every update
+Merge to `main` → wait for "Build deploy branch" → on the server:
+```bash
+/var/www/scimscore/deploy/aws/deploy.sh
+```
+
+## Needs from DevOps
+- outbound TCP 587 to smtp.sendgrid.net (email)
+- HTTPS in front of the server (ALB/Cloudflare) and its address range for TRUSTED_PROXIES
+- DNS for the domain; RDS automated backups

@@ -3,6 +3,14 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
+// TLS to the database (AWS RDS requires it). With a CA bundle set, the server certificate
+// and host name are verified. Pdo\Mysql constants exist from PHP 8.4; PDO:: ones before.
+$sslCa = env('MYSQL_ATTR_SSL_CA');
+$mysqlTls = extension_loaded('pdo_mysql') && $sslCa ? [
+    (class_exists(Mysql::class) ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => $sslCa,
+    (class_exists(Mysql::class) ? Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => true,
+] : [];
+
 return [
 
     /*
@@ -59,9 +67,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => $mysqlTls,
         ],
 
         'mariadb' => [
@@ -79,9 +85,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => $mysqlTls,
         ],
 
         'pgsql' => [
