@@ -31,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
             // Safety net: debug output in production would leak config and stack traces.
             config(['app.debug' => false]);
             URL::forceHttps();
+            // Behind CloudFront the Host header may be the origin's name: always build links from APP_URL.
+            if (filled(config('app.url'))) {
+                URL::forceRootUrl(rtrim((string) config('app.url'), '/'));
+            }
         }
 
         // Fail loudly on lazy loading, unknown attributes and silently discarded fields (dev/test).
