@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class CloudFrontProtoTest extends TestCase
 {
-    private function run(array $headers): Request
+    private function handled(array $headers): Request
     {
         $request = Request::create('http://origin.internal/');
         foreach ($headers as $k => $v) {
@@ -22,12 +22,12 @@ class CloudFrontProtoTest extends TestCase
 
     public function test_copies_cloudfront_proto(): void
     {
-        $this->assertSame('https', $this->run(['CloudFront-Forwarded-Proto' => 'https'])->headers->get('X-Forwarded-Proto'));
+        $this->assertSame('https', $this->handled(['CloudFront-Forwarded-Proto' => 'https'])->headers->get('X-Forwarded-Proto'));
     }
 
     public function test_keeps_existing_header_and_ignores_garbage(): void
     {
-        $this->assertSame('http', $this->run(['CloudFront-Forwarded-Proto' => 'https', 'X-Forwarded-Proto' => 'http'])->headers->get('X-Forwarded-Proto'));
-        $this->assertNull($this->run(['CloudFront-Forwarded-Proto' => 'javascript'])->headers->get('X-Forwarded-Proto'));
+        $this->assertSame('http', $this->handled(['CloudFront-Forwarded-Proto' => 'https', 'X-Forwarded-Proto' => 'http'])->headers->get('X-Forwarded-Proto'));
+        $this->assertNull($this->handled(['CloudFront-Forwarded-Proto' => 'javascript'])->headers->get('X-Forwarded-Proto'));
     }
 }
