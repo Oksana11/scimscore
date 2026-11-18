@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminSession;
+use App\Http\Middleware\CloudFrontProto;
 use App\Http\Middleware\EnsureProfileComplete;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\SecurityHeaders;
@@ -19,7 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $proxies = array_values(array_filter(array_map('trim', explode(',', (string) env('TRUSTED_PROXIES', '')))));
         if ($proxies !== []) {
-            $middleware->trustProxies(at: $proxies);
+            // "*" = trust the direct peer (e.g. CloudFront when port 80 is open to CloudFront only).
+            $middleware->trustProxies(at: $proxies === ['*'] ? '*' : $proxies);
+            $middleware->prepend(CloudFrontProto::class);
         }
 
         $middleware->append(SecurityHeaders::class);

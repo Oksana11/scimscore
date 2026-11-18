@@ -28,6 +28,7 @@ Merge to `main` → wait for "Build deploy branch" → on the server:
 ```
 
 ## Needs from DevOps
-- outbound TCP 587 to smtp.sendgrid.net (email)
-- HTTPS in front of the server (ALB/Cloudflare) and its address range for TRUSTED_PROXIES
+- outbound TCP 587 to smtp.sendgrid.net (email) must work
+- CloudFront (+WAF) in front, HTTPS at CloudFront, origin on port 80; TRUSTED_PROXIES=*
+- EC2 security group: port 80 only from the CloudFront origin-facing prefix list
 - DNS for the domain; RDS automated backups
