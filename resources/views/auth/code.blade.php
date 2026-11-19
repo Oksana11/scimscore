@@ -11,6 +11,7 @@
                 If <strong class="text-ink">{{ $email }}</strong> can receive email, a 6-digit code has been sent to it.
                 It is valid for {{ config('scim.otp.ttl_minutes') }} minutes and can be used once.
             </p>
+            <p class="mt-2 text-sm text-slate-500">No account yet? Entering the code creates one.</p>
 
             <form method="POST" action="{{ route('login.verify') }}" class="mt-7 space-y-5" novalidate>
                 @csrf

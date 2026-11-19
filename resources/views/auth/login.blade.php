@@ -7,7 +7,7 @@
         <a href="{{ route('home') }}" class="back-link"><x-icon name="chevron-left" class="size-4" /> Back</a>
         <div class="card mt-3 p-9">
             <h1 class="text-2xl font-bold">Sign in or create an account</h1>
-            <p class="mt-2 text-[15px] text-slate-500">Enter your email and we'll send you a 6-digit code. New here? An account is created automatically.</p>
+            <p class="mt-2 text-[15px] text-slate-500">Enter your email and we'll send you a 6-digit code.</p>
 
             <form method="POST" action="{{ route('login.send') }}" class="mt-7 space-y-5" novalidate>
                 @csrf
@@ -15,6 +15,7 @@
                     <label for="email" class="label">Email address</label>
                     <input id="email" name="email" type="email" class="input" value="{{ old('email') }}" placeholder="you@clinic.org"
                            autocomplete="email" inputmode="email" required autofocus @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>
+                    <p class="hint">Don't have an account? It will be created automatically after you enter the code.</p>
                     @error('email') <p id="email-error" class="field-error">{{ $message }}</p> @enderror
                 </div>
 
