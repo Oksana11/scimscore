@@ -4,6 +4,7 @@ use App\Http\Middleware\AdminSession;
 use App\Http\Middleware\CloudFrontProto;
 use App\Http\Middleware\EnsureProfileComplete;
 use App\Http\Middleware\EnsureUserIsActive;
+use App\Http\Middleware\PreventRequestForgery;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -26,7 +27,9 @@ return Application::configure(basePath: dirname(__DIR__))
         }
 
         $middleware->append(SecurityHeaders::class);
-        $middleware->web(append: ['throttle:web']);
+        $middleware->web(append: ['throttle:web'], replace: [
+            Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class => PreventRequestForgery::class,
+        ]);
 
         $middleware->alias([
             'active' => EnsureUserIsActive::class,
