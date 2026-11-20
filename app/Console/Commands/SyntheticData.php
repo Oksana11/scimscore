@@ -71,13 +71,19 @@ class SyntheticData extends Command
         }
 
         $professions = DB::table('professions')->pluck('id')->all();
-        $countries = ['IL', 'IL', 'IL', 'US', 'DE', 'IT', 'CH'];
+        $countries = DB::table('countries')->whereIn('code', ['IL', 'US', 'DE', 'IT', 'CH'])->pluck('code')->all();
+        if ($professions === [] || $countries === []) {
+            $this->error('Reference lists are empty: run `php artisan db:seed --force` first.');
+
+            return self::FAILURE;
+        }
+        $countries = array_merge($countries, array_fill(0, 3, in_array('IL', $countries, true) ? 'IL' : $countries[0]));
         $definition = ScimDefinition::for(ScimVersion::III);
         $allowed = $definition->allowedScores();
 
         $institutions = collect(range(1, 3))->map(fn ($i) => Institution::query()->firstOrCreate(
             ['name' => "Demo Rehabilitation Center {$i}"],
-            ['country_code' => 'IL', 'is_custom' => true],
+            ['country_code' => $countries[0], 'is_custom' => true],
         ));
 
         $counts = ['users' => 0, 'patients' => 0, 'assessments' => 0, 'quick' => 0];

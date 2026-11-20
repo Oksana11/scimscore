@@ -26,6 +26,7 @@ class SyntheticDataTest extends TestCase
 
     public function test_wipes_real_data_and_creates_synthetic_data(): void
     {
+        $this->seed();
         config(['scim.allow_synthetic_data' => true, 'app.url' => 'https://dev.scimscore.com']);
         $real = User::factory()->withProfile()->create(['email' => 'real.doctor@clinic.org']);
         Patient::factory()->for($real)->create();
