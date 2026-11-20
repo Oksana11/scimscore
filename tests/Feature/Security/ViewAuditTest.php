@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\Security;
 
+use App\Models\Admin;
 use App\Models\Assessment;
 use App\Models\AuditLog;
 use App\Models\Patient;
 use App\Models\User;
+use App\Support\Security\AuditLogger;
+use App\Support\Security\Totp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -61,5 +64,19 @@ class ViewAuditTest extends TestCase
         $this->assertSame((string) $intruder->id, (string) $denied->actor_id);
         $this->assertSame((string) $patient->id, $denied->subject_id);
         $this->assertNull($this->logged('patient.viewed'));
+    }
+
+    public function test_admin_audit_tabs_separate_views_from_activity(): void
+    {
+        $admin = Admin::query()->create(['email' => 'boss@scim.org', 'name' => 'Boss']);
+        $admin->forceFill(['totp_secret' => Totp::generateSecret(), 'totp_confirmed_at' => now()])->save();
+        $audit = app(AuditLogger::class);
+        $audit->log('patient.created');
+        $audit->log('patient.viewed');
+        $this->actingAs($admin, 'admin');
+
+        $this->get('/admin/audit')->assertOk()->assertSee('patient.created')->assertDontSee('patient.viewed');
+        $this->get('/admin/audit?category=views')->assertOk()->assertSee('patient.viewed')->assertDontSee('patient.created');
+        $this->get('/admin/audit?category=all')->assertOk()->assertSee('patient.viewed')->assertSee('patient.created');
     }
 }

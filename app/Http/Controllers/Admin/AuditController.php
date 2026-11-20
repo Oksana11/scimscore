@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\AuditLog;
+use App\Support\Security\AuditCategories;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -16,9 +17,11 @@ class AuditController extends AdminController
             'action' => ['nullable', 'string', 'max:64'],
             'actor_type' => ['nullable', 'in:guest,user,admin,system'],
             'actor_id' => ['nullable', 'integer'],
+            'category' => ['nullable', 'in:'.implode(',', array_keys(AuditCategories::LABELS))],
         ]);
+        $category = $f['category'] ?? AuditCategories::DEFAULT;
 
-        $logs = AuditLog::query()
+        $logs = AuditCategories::apply(AuditLog::query(), $category)
             ->when($f['action'] ?? null, fn ($q, $v) => $q->where('action', 'like', addcslashes($v, '%_\\').'%'))
             ->when($f['actor_type'] ?? null, fn ($q, $v) => $q->where('actor_type', $v))
             ->when($f['actor_id'] ?? null, fn ($q, $v) => $q->where('actor_id', $v))
@@ -28,7 +31,7 @@ class AuditController extends AdminController
 
         $this->log('admin.view_audit', context: ['filters' => array_keys(array_filter($f, fn ($v) => $v !== null && $v !== ''))]);
 
-        return view('admin.audit', ['logs' => $logs, 'filters' => $f]);
+        return view('admin.audit', ['logs' => $logs, 'filters' => $f, 'category' => $category]);
     }
 
     public function verify(): RedirectResponse
