@@ -42,7 +42,7 @@ final class AuditLogger
             'context' => $context === [] ? null : self::canonicalJson($this->redact($context)),
         ];
 
-        return DB::transaction(function () use ($record) {
+        $log = DB::transaction(function () use ($record) {
             $prev = AuditLog::query()->orderByDesc('id')->lockForUpdate()->value('hash') ?? self::GENESIS;
 
             $record['prev_hash'] = $prev;
@@ -50,6 +50,11 @@ final class AuditLogger
 
             return AuditLog::query()->create($record);
         });
+
+        // Outside the transaction: alerting must never block or roll back the audit record.
+        app(SecurityMonitor::class)->inspect($log);
+
+        return $log;
     }
 
     public const ANCHOR_KEY = 'audit_chain_anchor';
