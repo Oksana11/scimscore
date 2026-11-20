@@ -21,6 +21,12 @@ APP_URL, TRUSTED_PROXIES. Then:
 ```
 Back up APP_KEY, BLIND_INDEX_KEY and AUDIT_HMAC_KEY from `.env` to a password manager.
 
+## Secrets Manager (optional, recommended)
+DevOps: create secret `scimscore/production` (JSON: DB_PASSWORD, MAIL_PASSWORD, APP_KEY, BLIND_INDEX_KEY,
+AUDIT_HMAC_KEY), attach an instance role to the EC2 with `secretsmanager:GetSecretValue` on that secret
+only, install AWS CLI. Then set `SECRETS_ID=scimscore/production` in `.env` and run `deploy.sh` —
+values are synced on every deploy; rotate a password in Secrets Manager and redeploy.
+
 ## Scheduler
 `setup.sh` installs a cron entry for `www-data`: `php artisan schedule:run` every minute.
 It runs `data:prune` daily (retention: config/scim.php → `retention`). Check: `sudo crontab -u www-data -l`.
