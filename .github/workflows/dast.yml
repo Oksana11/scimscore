@@ -1,0 +1,72 @@
+name: DAST
+
+# Dynamic scan of the running app with OWASP ZAP (baseline = passive, safe):
+# headers, cookies, CSP, information leaks… on a throw-away copy with test data.
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * 1' # weekly, Monday 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dast-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap:
+    name: DAST (ZAP baseline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_sqlite, gd, zip, bcmath
+          coverage: none
+          tools: composer:v2
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Build and start the app (staging mode - no debug, no forced HTTPS; SQLite, test data)
+        run: |
+          composer install --no-interaction --no-progress --prefer-dist --no-dev --optimize-autoloader
+          npm ci && npm run build
+          cp .env.example .env
+          sed -i 's/^APP_ENV=.*/APP_ENV=staging/; s/^APP_DEBUG=.*/APP_DEBUG=false/; s#^APP_URL=.*#APP_URL=http://localhost:8000#; s/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/; s#^DB_DATABASE=.*#DB_DATABASE='"$PWD"'/database/dast.sqlite#; s/^MAIL_MAILER=.*/MAIL_MAILER=log/' .env
+          echo "SESSION_SECURE_COOKIE=false" >> .env
+          touch database/dast.sqlite
+          php artisan key:generate --force
+          php artisan security:generate-keys
+          php artisan migrate --force --seed
+          php artisan optimize
+          nohup php artisan serve --host=0.0.0.0 --port=8000 > /tmp/serve.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:8000/up >/dev/null && break; sleep 1; done
+          curl -sf -o /dev/null -w 'home: %{http_code}\n' http://localhost:8000/
+
+      # Fails on ZAP "FAIL" rules; warnings are listed in the job summary for review.
+      # Rules that don't apply to this local HTTP copy are configured in .zap/rules.tsv.
+      - name: OWASP ZAP baseline
+        run: |
+          mkdir -p zap && chmod 777 zap
+          docker run --rm --network host -v "$PWD/zap:/zap/wrk:rw" -v "$PWD/.zap:/zap/cfg:ro" \
+            ghcr.io/zaproxy/zaproxy:2.16.1 zap-baseline.py \
+            -t http://localhost:8000 -c /zap/cfg/rules.tsv -m 3 -I \
+            -r report.html -w report.md -J report.json || code=$?
+          cat zap/report.md >> "$GITHUB_STEP_SUMMARY" || true
+          python3 - <<'PY'
+          import json, sys
+          r = json.load(open('zap/report.json'))
+          high = [a for s in r.get('site', []) for a in s.get('alerts', []) if a.get('riskcode') == '3']
+          for a in high:
+              print(f"::error::ZAP high risk: {a['alert']}")
+          sys.exit(1 if high else 0)
+          PY
+          exit ${code:-0}

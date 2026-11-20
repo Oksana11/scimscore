@@ -1,0 +1,4 @@
+10035	IGNORE	(Strict-Transport-Security: HSTS is set on the real HTTPS site, not on this local HTTP copy)
+10011	IGNORE	(Cookie without Secure flag: local HTTP copy only; production sets SESSION_SECURE_COOKIE=true)
+10049	IGNORE	(Storable and cacheable content: informational)
+10109	IGNORE	(Modern web application: informational)

@@ -156,7 +156,8 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    // Always a host-only cookie: never shared with subdomains (not configurable on purpose).
+    'domain' => null,
 
     /*
     |--------------------------------------------------------------------------

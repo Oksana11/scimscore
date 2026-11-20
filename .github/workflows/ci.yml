@@ -72,3 +72,27 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sast:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install Semgrep and pinned community rules
+        run: |
+          pip install --quiet semgrep==1.180.0
+          git clone --quiet https://github.com/semgrep/semgrep-rules.git /tmp/semgrep-rules
+          git -C /tmp/semgrep-rules checkout --quiet a5ad1714f00c9f7fde980cab0ea1d6dc6d414fd2
+          find /tmp/semgrep-rules -name '*.test.*' -delete
+      # PHP/Laravel + browser JavaScript security rules. Any finding fails the build;
+      # a false positive is fixed in code or excluded with a justified `nosemgrep` comment.
+      - name: Static security analysis
+        run: |
+          semgrep scan --metrics=off --error \
+            --config /tmp/semgrep-rules/php \
+            --config /tmp/semgrep-rules/javascript/lang \
+            --config /tmp/semgrep-rules/javascript/browser \
+            app bootstrap config database routes resources/js public/index.php
