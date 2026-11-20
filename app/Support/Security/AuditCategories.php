@@ -50,7 +50,8 @@ final class AuditCategories
     {
         foreach (['views' => self::VIEWS, 'security' => self::SECURITY, 'exports' => self::EXPORTS] as $cat => $patterns) {
             foreach ($patterns as $p) {
-                $regex = '/^'.str_replace(['\_', '%', '.'], ['_', '.*', '\.'], $p).'$/';
+                // LIKE pattern -> regex: "%" is a wildcard, "\_" a literal underscore.
+                $regex = '/^'.str_replace('%', '.*', preg_quote(str_replace('\_', '_', $p), '/')).'$/';
                 if (preg_match($regex, $action)) {
                     return $cat;
                 }
