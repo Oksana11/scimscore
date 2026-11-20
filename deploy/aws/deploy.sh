@@ -2,6 +2,7 @@
 # Update the site to the latest `deploy` branch. Run on the server as ubuntu:
 #   /var/www/scimscore/deploy/aws/deploy.sh
 set -euo pipefail
+umask 002   # files created in storage/ stay writable for php-fpm (group www-data)
 
 APP=/var/www/scimscore
 PHP=/usr/bin/php8.3

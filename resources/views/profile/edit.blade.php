@@ -52,5 +52,19 @@
                 @error('new_email') <p class="field-error">{{ $message }}</p> @enderror
             </form>
         </div>
+
+        <div class="card mt-5 border-red-200">
+            <h2 class="text-lg font-semibold text-red-800">Delete account</h2>
+            <p class="mt-1 text-sm text-slate-600">Your email and profile are erased and you are signed out. Your patients and assessments stay in the research database <strong>anonymously</strong>: Research IDs and aliases are wiped, so nobody (including you) can link them to a person again. This cannot be undone.</p>
+            <form method="POST" action="{{ route('profile.destroy') }}" class="mt-4 flex flex-wrap items-end gap-3">
+                @csrf @method('DELETE')
+                <div>
+                    <label for="confirm-account" class="label">Type DELETE to confirm</label>
+                    <input id="confirm-account" name="confirm" class="input" autocomplete="off" required pattern="DELETE">
+                    @error('confirm') <p class="field-error">{{ $message }}</p> @enderror
+                </div>
+                <button type="submit" class="btn-secondary text-red-700">Delete my account</button>
+            </form>
+        </div>
     </div>
 @endsection

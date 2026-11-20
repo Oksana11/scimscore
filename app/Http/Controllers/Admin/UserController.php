@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
+use App\Services\Privacy\DataEraser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -33,10 +34,24 @@ class UserController extends AdminController
 
     public function toggle(User $user): RedirectResponse
     {
+        abort_if($user->anonymized_at !== null, 404); // deleted accounts cannot be reactivated
         $active = ! $user->is_active;
         $user->forceFill(['is_active' => $active, 'deactivated_at' => $active ? null : now()])->save();
         $this->log($active ? 'admin.user_activated' : 'admin.user_deactivated', $user);
 
         return back()->with('status', $active ? 'User activated.' : 'User deactivated. They are signed out on their next request.');
+    }
+
+    /**
+     * Erasure on request: same as the user deleting their own account.
+     */
+    public function destroy(Request $request, User $user, DataEraser $eraser): RedirectResponse
+    {
+        $request->validate(['confirm' => ['required', 'in:DELETE']], ['confirm.in' => 'Type DELETE to confirm.']);
+        abort_if($user->anonymized_at !== null, 404);
+
+        $eraser->eraseAccount($user, 'admin#'.$this->admin()->id);
+
+        return back()->with('status', 'Account deleted. Patients and assessments were kept as anonymous data.');
     }
 }

@@ -24,11 +24,13 @@ class DataSegregationTest extends TestCase
         $this->assertSame(0, Patient::query()->ownedBy($alice)->count());
     }
 
-    public function test_nobody_can_delete_patients(): void
+    public function test_only_the_owner_can_delete_a_patient(): void
     {
         $patient = Patient::factory()->create();
+        $other = User::factory()->withProfile()->create();
 
-        $this->assertFalse($patient->user->can('delete', $patient));
+        $this->assertTrue($patient->user->can('delete', $patient));
+        $this->assertFalse($other->can('delete', $patient));
     }
 
     public function test_user_sees_only_own_assessments_and_cannot_change_them(): void

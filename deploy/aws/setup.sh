@@ -58,4 +58,8 @@ sudo nginx -t
 sudo systemctl enable --now php8.3-fpm nginx
 sudo systemctl reload nginx
 
+echo "== Scheduler (daily data:prune), runs as www-data like php-fpm"
+CRON="* * * * * cd $APP && /usr/bin/php8.3 artisan schedule:run >> /dev/null 2>&1"
+( sudo crontab -u www-data -l 2>/dev/null | grep -v 'artisan schedule:run'; echo "$CRON" ) | sudo crontab -u www-data -
+
 echo "Done. Next: create $APP/.env (see deploy/aws/README.md), then run deploy/aws/first-run.sh"
