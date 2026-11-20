@@ -1,0 +1,8 @@
+10035	IGNORE	(Strict-Transport-Security: HSTS is set on the real HTTPS site, not on this local HTTP copy)
+10011	IGNORE	(Cookie without Secure flag: local HTTP copy only; production sets SESSION_SECURE_COOKIE=true)
+10049	IGNORE	(Storable and cacheable content: informational)
+10109	IGNORE	(Modern web application: informational)
+10044	IGNORE	(Big redirect: Laravel redirect bodies only contain the target URL)
+10112	IGNORE	(Session management response identified: informational)
+10116	IGNORE	(ZAP out of date: image is pinned on purpose; bump the version in dast.yml)
+10021	WARN	(X-Content-Type-Options on static files: php artisan serve in CI; production nginx adds it)

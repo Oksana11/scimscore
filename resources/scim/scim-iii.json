@@ -1,0 +1,723 @@
+{
+  "version": "III",
+  "title": "Spinal Cord Independence Measure, version III",
+  "source": "scimscore.com Drupal webform (webform_component), 2012",
+  "sections": [
+    {
+      "key": "self_care",
+      "title": "Self-Care",
+      "items": [
+        {
+          "key": "v1",
+          "number": "1",
+          "title": "Feeding (cutting, opening containers, pouring, bringing food to mouth, holding cup with fluid)",
+          "options": [
+            {
+              "score": 0,
+              "label": "Needs parenteral, gastrostomy, or fully assisted oral feeding"
+            },
+            {
+              "score": 1,
+              "label": "Needs partial assistance for eating and/or drinking, or for wearing adaptive devices"
+            },
+            {
+              "score": 2,
+              "label": "Eats independently; needs adaptive devices or assistance only for cutting food and/or pouring and/or opening containers"
+            },
+            {
+              "score": 3,
+              "label": "Eats and drinks independently; does not require assistance or adaptive devices"
+            }
+          ]
+        },
+        {
+          "key": "v2",
+          "number": "2A",
+          "title": "Upper body",
+          "group": "Bathing (soaping, washing, drying body and head, manipulating water tap)",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Requires partial assistance"
+            },
+            {
+              "score": 2,
+              "label": "Washes independently with adaptive devices or in a specific setting (e.g., bars, chair)"
+            },
+            {
+              "score": 3,
+              "label": "Washes independently; does not require adaptive devices or specific setting (not customary for healthy people) (adss)"
+            }
+          ]
+        },
+        {
+          "key": "v3",
+          "number": "2B",
+          "title": "Lower body",
+          "group": "Bathing (soaping, washing, drying body and head, manipulating water tap)",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Requires partial assistance"
+            },
+            {
+              "score": 2,
+              "label": "Washes independently with adaptive devices or in a specific setting (adss)"
+            },
+            {
+              "score": 3,
+              "label": "Washes independently; does not require adaptive devices (adss) or specific setting"
+            }
+          ]
+        },
+        {
+          "key": "v4",
+          "number": "3A",
+          "title": "Upper body",
+          "group": "Dressing (clothes, shoes, permanent orthoses: dressing, wearing, undressing).",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Requires partial assistance with clothes without buttons, zippers or laces (cwobzl)"
+            },
+            {
+              "score": 2,
+              "label": "Independent with cwobzl; requires adaptive devices and/or specific settings (adss)"
+            },
+            {
+              "score": 3,
+              "label": "Independent with cwobzl; does not require adss; needs assistance or adss only for bzl"
+            },
+            {
+              "score": 4,
+              "label": "Dresses (any cloth) independently; does not require adaptive devices or specific setting"
+            }
+          ]
+        },
+        {
+          "key": "v5",
+          "number": "3B",
+          "title": "Lower body",
+          "group": "Dressing (clothes, shoes, permanent orthoses: dressing, wearing, undressing).",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Requires partial assistance with clothes without buttons, zippers or laces (cwobzl)"
+            },
+            {
+              "score": 2,
+              "label": "Independent with cwobzl; requires adaptive devices and/or specific settings (adss)"
+            },
+            {
+              "score": 3,
+              "label": "Independent with cwobzl without adss; needs assistance or adss only for bzl"
+            },
+            {
+              "score": 4,
+              "label": "Dresses (any cloth) independently; does not require adaptive devices or specific setting"
+            }
+          ]
+        },
+        {
+          "key": "v6",
+          "number": "4",
+          "title": "Grooming (washing hands and face, brushing teeth, combing hair, shaving, applying makeup)",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Requires partial assistance"
+            },
+            {
+              "score": 2,
+              "label": "Grooms independently with adaptive devices"
+            },
+            {
+              "score": 3,
+              "label": "Grooms independently without adaptive devices"
+            }
+          ]
+        }
+      ],
+      "max": 20
+    },
+    {
+      "key": "respiration_sphincter",
+      "title": "Respiration and Sphincter Management",
+      "items": [
+        {
+          "key": "v7",
+          "number": "5",
+          "title": "Respiration",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires tracheal tube (TT) and permanent or intermittent assisted ventilation (IAV)"
+            },
+            {
+              "score": 2,
+              "label": "Breathes independently with TT; requires oxygen, much assistance in coughing or TT management"
+            },
+            {
+              "score": 4,
+              "label": "Breathes independently with TT; requires little assistance in coughing or TT managemen"
+            },
+            {
+              "score": 6,
+              "label": "Breathes independently without TT; requires oxygen, much assistance in coughing, a mask (e.g., peep) or IAV (bipap)"
+            },
+            {
+              "score": 8,
+              "label": "Breathes independently without TT; requires little assistance or stimulation for coughing"
+            },
+            {
+              "score": 10,
+              "label": "Breathes independently without assistance or device"
+            }
+          ]
+        },
+        {
+          "key": "v8",
+          "number": "6",
+          "title": "Sphincter Management - Bladder",
+          "options": [
+            {
+              "score": 0,
+              "label": "Indwelling catheter"
+            },
+            {
+              "score": 3,
+              "label": "Residual urine volume (RUV) > 100cc; no regular catheterization or assisted intermittent catheterization"
+            },
+            {
+              "score": 6,
+              "label": "RUV < 100cc or intermittent self-catheterization; needs assistance for applying drainage instrument"
+            },
+            {
+              "score": 9,
+              "label": "Intermittent self-catheterization; uses external drainage instrument; does not need assistance for applying"
+            },
+            {
+              "score": 11,
+              "label": "Intermittent self-catheterization; continent between catheterizations; does not use external drainage instrument"
+            },
+            {
+              "score": 13,
+              "label": "RUV <100cc; needs only external urine drainage; no assistance is required for drainage"
+            },
+            {
+              "score": 15,
+              "label": "RUV <100cc; continent; does not use external drainage instrument"
+            }
+          ]
+        },
+        {
+          "key": "v9",
+          "number": "7",
+          "title": "Sphincter Management - Bowel",
+          "options": [
+            {
+              "score": 0,
+              "label": "Irregular timing or very low frequency (less than once in 3 days) of bowel movements"
+            },
+            {
+              "score": 5,
+              "label": "Regular timing, but requires assistance (e.g., for applying suppository); rare accidents (less than twice a month)"
+            },
+            {
+              "score": 8,
+              "label": "Regular bowel movements, without assistance; rare accidents (less than twice a month)"
+            },
+            {
+              "score": 10,
+              "label": "Regular bowel movements, without assistance; no accidents"
+            }
+          ]
+        },
+        {
+          "key": "v10",
+          "number": "8",
+          "title": "Use of Toilet (perineal hygiene, adjustment of clothes before/after, use of napkins or diapers)",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Requires partial assistance; does not clean self"
+            },
+            {
+              "score": 2,
+              "label": "Requires partial assistance; cleans self independently"
+            },
+            {
+              "score": 4,
+              "label": "Uses toilet independently in all tasks but needs adaptive devices or special setting (e.g., bars)"
+            },
+            {
+              "score": 5,
+              "label": "Uses toilet independently; does not require adaptive devices or special setting"
+            }
+          ]
+        }
+      ],
+      "max": 40
+    },
+    {
+      "key": "mobility",
+      "title": "Mobility",
+      "items": [
+        {
+          "key": "v11",
+          "number": "9",
+          "title": "Mobility in Bed and Action to Prevent Pressure Sores",
+          "subsection": "Room and toilet",
+          "options": [
+            {
+              "score": 0,
+              "label": "Needs assistance in all activities: turning upper body in bed, turning lower body in bed,sitting up in bed, doing push-ups in wheelchair, with or without adaptive devices, but not with electric aids"
+            },
+            {
+              "score": 2,
+              "label": "Performs one of the activities without assistance"
+            },
+            {
+              "score": 4,
+              "label": "Performs two or three of the activities without assistance"
+            },
+            {
+              "score": 6,
+              "label": "Performs all the bed mobility and pressure release activities independently"
+            }
+          ]
+        },
+        {
+          "key": "v12",
+          "number": "10",
+          "title": "Transfers: bed-wheelchair (locking wheelchair, lifting footrests, removing and adjusting arm rests, transferring, lifting feet)",
+          "subsection": "Room and toilet",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Needs partial assistance and/or supervision, and/or adaptive devices (e.g., sliding board)"
+            },
+            {
+              "score": 2,
+              "label": "Independent (or does not require wheelchair)"
+            }
+          ]
+        },
+        {
+          "key": "v13",
+          "number": "11",
+          "title": "Transfers: wheelchair-toilet-tub (if uses toilet wheelchair: transfers to and from; if uses regular wheelchair: locking wheelchair, lifting footrests, removing and adjusting armrests, transferring, lifting feet)",
+          "subsection": "Room and toilet",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Needs partial assistance and/or supervision, and/or adaptive devices (e.g., grab-bars)"
+            },
+            {
+              "score": 2,
+              "label": "Independent (or does not require wheelchair)"
+            }
+          ]
+        },
+        {
+          "key": "v14",
+          "number": "12",
+          "title": "Mobility Indoors",
+          "subsection": "Indoors and outdoors, on even surface",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Needs electric wheelchair or partial assistance to operate manual wheelchair"
+            },
+            {
+              "score": 2,
+              "label": "Moves independently in manual wheelchair"
+            },
+            {
+              "score": 3,
+              "label": "Requires supervision while walking (with or without devices)"
+            },
+            {
+              "score": 4,
+              "label": "Walks with a walking frame or crutches (swing)"
+            },
+            {
+              "score": 5,
+              "label": "Walks with crutches or two canes (reciprocal walking)"
+            },
+            {
+              "score": 6,
+              "label": "Walks with one cane"
+            },
+            {
+              "score": 7,
+              "label": "Needs leg orthosis only"
+            },
+            {
+              "score": 8,
+              "label": "Walks without walking aids"
+            }
+          ]
+        },
+        {
+          "key": "v15",
+          "number": "13",
+          "title": "Mobility for Moderate Distances (10-100 meters)",
+          "subsection": "Indoors and outdoors, on even surface",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Needs electric wheelchair or partial assistance to operate manual wheelchair"
+            },
+            {
+              "score": 2,
+              "label": "Moves independently in manual wheelchair"
+            },
+            {
+              "score": 3,
+              "label": "Requires supervision while walking (with or without devices)"
+            },
+            {
+              "score": 4,
+              "label": "Walks with a walking frame or crutches (swing)"
+            },
+            {
+              "score": 5,
+              "label": "Walks with crutches or two canes (reciprocal walking)"
+            },
+            {
+              "score": 6,
+              "label": "Walks with one cane"
+            },
+            {
+              "score": 7,
+              "label": "Needs leg orthosis only"
+            },
+            {
+              "score": 8,
+              "label": "Walks without walking aids"
+            }
+          ]
+        },
+        {
+          "key": "v16",
+          "number": "14",
+          "title": "Mobility Outdoors (more than 100 meters)",
+          "subsection": "Indoors and outdoors, on even surface",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Needs electric wheelchair or partial assistance to operate manual wheelchair"
+            },
+            {
+              "score": 2,
+              "label": "Moves independently in manual wheelchair"
+            },
+            {
+              "score": 3,
+              "label": "Requires supervision while walking (with or without devices)"
+            },
+            {
+              "score": 4,
+              "label": "Walks with a walking frame or crutches (swing)"
+            },
+            {
+              "score": 5,
+              "label": "Walks with crutches or two canes (reciprocal waking)"
+            },
+            {
+              "score": 6,
+              "label": "Walks with one cane"
+            },
+            {
+              "score": 7,
+              "label": "Needs leg orthosis only"
+            },
+            {
+              "score": 8,
+              "label": "Walks without walking aids"
+            }
+          ]
+        },
+        {
+          "key": "v17",
+          "number": "15",
+          "title": "Stair Management",
+          "subsection": "Indoors and outdoors, on even surface",
+          "options": [
+            {
+              "score": 0,
+              "label": "Unable to ascend or descend stairs"
+            },
+            {
+              "score": 1,
+              "label": "Ascends and descends at least 3 steps with support or supervision of another person"
+            },
+            {
+              "score": 2,
+              "label": "Ascends and descends at least 3 steps with support of handrail and/or crutch or cane"
+            },
+            {
+              "score": 3,
+              "label": "Ascends and descends at least 3 steps without any support or supervision"
+            }
+          ]
+        },
+        {
+          "key": "v18",
+          "number": "16",
+          "title": "Transfers: wheelchair-car (approaching car, locking wheelchair, removing arm- and footrests, transferring to and from car, bring wheelchair into and out of car)",
+          "subsection": "Indoors and outdoors, on even surface",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires total assistance"
+            },
+            {
+              "score": 1,
+              "label": "Needs partial assistance and/or supervision and/or adaptive devices"
+            },
+            {
+              "score": 2,
+              "label": "Transfers independent; does not require adaptive devices (or does not require wheelchair)"
+            }
+          ]
+        },
+        {
+          "key": "v19",
+          "number": "17",
+          "title": "Transfers: ground-wheelchair",
+          "subsection": "Indoors and outdoors, on even surface",
+          "options": [
+            {
+              "score": 0,
+              "label": "Requires assistance"
+            },
+            {
+              "score": 1,
+              "label": "Transfers independent with or without adaptive devices (or does not require wheelchair)"
+            }
+          ]
+        }
+      ],
+      "max": 40
+    }
+  ],
+  "grade_reference": {
+    "note": "Nearest reference vector (L1 distance over v1..v19). Source: Drupal content_type_scim_scores; G.v3 corrected 34 -> 3.",
+    "vectors": {
+      "A": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "B": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "C": [
+        3,
+        2,
+        1,
+        2,
+        0,
+        3,
+        10,
+        0,
+        0,
+        0,
+        2,
+        1,
+        0,
+        2,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      "D": [
+        3,
+        2,
+        0,
+        1,
+        0,
+        3,
+        10,
+        3,
+        5,
+        0,
+        2,
+        1,
+        0,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "E": [
+        3,
+        3,
+        1,
+        3,
+        0,
+        3,
+        10,
+        11,
+        5,
+        0,
+        4,
+        1,
+        0,
+        2,
+        2,
+        2,
+        0,
+        0,
+        0
+      ],
+      "F": [
+        3,
+        2,
+        1,
+        2,
+        1,
+        3,
+        10,
+        15,
+        10,
+        4,
+        6,
+        1,
+        1,
+        2,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      "G": [
+        3,
+        3,
+        3,
+        4,
+        4,
+        3,
+        10,
+        15,
+        10,
+        5,
+        6,
+        2,
+        2,
+        4,
+        2,
+        2,
+        1,
+        2,
+        1
+      ],
+      "H": [
+        3,
+        3,
+        3,
+        4,
+        4,
+        3,
+        10,
+        15,
+        10,
+        5,
+        6,
+        2,
+        2,
+        8,
+        8,
+        8,
+        3,
+        2,
+        1
+      ]
+    }
+  }
+}
