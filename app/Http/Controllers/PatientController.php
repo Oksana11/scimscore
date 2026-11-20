@@ -9,6 +9,7 @@ use App\Enums\ScimVersion;
 use App\Http\Requests\PatientRequest;
 use App\Models\Patient;
 use App\Services\Patients\DuplicateDetector;
+use App\Services\Privacy\DataEraser;
 use App\Support\Security\AuditLogger;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -218,6 +219,16 @@ class PatientController extends Controller
     /**
      * @return array<string, mixed>
      */
+    public function destroy(Request $request, Patient $patient, DataEraser $eraser): RedirectResponse
+    {
+        Gate::authorize('delete', $patient);
+        $request->validate(['confirm' => ['required', 'in:DELETE']], ['confirm.in' => 'Type DELETE to confirm.']);
+
+        $eraser->deletePatient($patient, 'owner');
+
+        return redirect()->route('patients.index')->with('status', __('The patient and all their assessments were deleted.'));
+    }
+
     private function options(): array
     {
         return [

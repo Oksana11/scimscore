@@ -69,7 +69,8 @@ Route::middleware(['auth:web', 'active'])->group(function () {
         Route::post('/profile/email', [EmailChangeController::class, 'store'])->middleware('throttle:otp-send')->name('profile.email.store');
         Route::post('/profile/email/confirm', [EmailChangeController::class, 'confirm'])->middleware('throttle:otp-verify')->name('profile.email.confirm');
 
-        Route::resource('patients', PatientController::class)->except(['destroy']);
+        Route::resource('patients', PatientController::class);
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::post('/patients/{patient}/merge', [PatientController::class, 'mergeInto'])->name('patients.merge');
         Route::get('/patients/{patient}/assessments/create', [PatientAssessmentController::class, 'create'])->name('patients.assessments.create');
         Route::post('/patients/{patient}/assessments', [PatientAssessmentController::class, 'store'])->name('patients.assessments.store');
@@ -105,6 +106,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/users', [AdminUserController::class, 'index'])->name('users');
         Route::post('/users/{user}/toggle', [AdminUserController::class, 'toggle'])->name('users.toggle');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
         Route::get('/patients', [AdminDataController::class, 'patients'])->name('patients');
         Route::get('/assessments', [AdminDataController::class, 'assessments'])->name('assessments');

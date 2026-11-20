@@ -52,6 +52,32 @@ final class AuditLogger
         });
     }
 
+    public const ANCHOR_KEY = 'audit_chain_anchor';
+
+    /**
+     * Signed start of the chain after old records were pruned: "id:prev_hash:hmac".
+     */
+    public static function signAnchor(int $id, string $prevHash): string
+    {
+        return $id.':'.$prevHash.':'.hash_hmac('sha256', "anchor\n{$id}\n{$prevHash}", self::key());
+    }
+
+    /**
+     * @return array{id: int, prev_hash: string}|null null when missing or forged
+     */
+    public static function readAnchor(?string $value): ?array
+    {
+        $parts = explode(':', (string) $value);
+        if (count($parts) !== 3) {
+            return null;
+        }
+        [$id, $prev, $mac] = $parts;
+
+        return hash_equals(hash_hmac('sha256', "anchor\n{$id}\n{$prev}", self::key()), $mac)
+            ? ['id' => (int) $id, 'prev_hash' => $prev]
+            : null;
+    }
+
     /**
      * @param  array<string, mixed>  $record
      */

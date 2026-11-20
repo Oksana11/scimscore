@@ -22,7 +22,7 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($users as $u)
                     <tr>
-                        <td class="px-4 py-3">{{ $u->email }}</td>
+                        <td class="px-4 py-3">{{ $u->anonymized_at ? 'Deleted user' : $u->email }}</td>
                         <td class="px-4 py-3">{{ $u->profile?->profession?->name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $u->profile?->institution?->name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $u->profile?->country?->name ?? '—' }}</td>
@@ -31,11 +31,22 @@
                         <td class="px-4 py-3">{{ $u->created_at->format('Y-m-d') }}</td>
                         <td class="px-4 py-3">{{ $u->last_login_at?->format('Y-m-d H:i') ?? '—' }}</td>
                         <td class="px-4 py-3">
-                            <form method="POST" action="{{ route('admin.users.toggle', $u) }}" class="flex items-center gap-2">
-                                @csrf
-                                <span class="{{ $u->is_active ? 'text-green-700' : 'text-red-700' }}">{{ $u->is_active ? 'Active' : 'Inactive' }}</span>
-                                <button class="btn-link">{{ $u->is_active ? 'Deactivate' : 'Activate' }}</button>
-                            </form>
+                            @if ($u->anonymized_at)
+                                <span class="text-slate-400">Deleted {{ $u->anonymized_at->format('Y-m-d') }}</span>
+                            @else
+                                <div class="flex items-center gap-3 whitespace-nowrap">
+                                    <form method="POST" action="{{ route('admin.users.toggle', $u) }}" class="flex items-center gap-2">
+                                        @csrf
+                                        <span class="{{ $u->is_active ? 'text-green-700' : 'text-red-700' }}">{{ $u->is_active ? 'Active' : 'Inactive' }}</span>
+                                        <button class="btn-link">{{ $u->is_active ? 'Deactivate' : 'Activate' }}</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.users.destroy', $u) }}" data-confirm="Delete this account on the user's request? Email and profile are erased; patients and assessments stay as anonymous data. This cannot be undone.">
+                                        @csrf @method('DELETE')
+                                        <input type="hidden" name="confirm" value="DELETE">
+                                        <button class="btn-link text-red-700">Delete</button>
+                                    </form>
+                                </div>
+                            @endif
                         </td>
                     </tr>
                 @empty

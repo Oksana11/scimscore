@@ -3,6 +3,7 @@
 #   /var/www/scimscore/deploy/aws/first-run.sh admin@email AdminName
 # Never run again on a live site: new keys would make encrypted data unreadable.
 set -euo pipefail
+umask 002   # files created in storage/ stay writable for php-fpm (group www-data)
 
 APP=/var/www/scimscore
 PHP=/usr/bin/php8.3

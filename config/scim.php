@@ -16,6 +16,14 @@ return [
         'resend_seconds' => 60,
     ],
 
+    // How long data is kept (days). Pruned daily by `php artisan data:prune` (scheduler).
+    // Patients, assessments and quick assessments are research data and are not pruned.
+    'retention' => [
+        'otp_days' => 1,
+        'support_days' => 730,
+        'audit_days' => 730,
+    ],
+
     'ror' => [
         'base_url' => env('ROR_API_URL', 'https://api.ror.org/v2'),
         // Optional client id (higher rate limits): https://ror.readme.io/docs/client-id

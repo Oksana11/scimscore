@@ -9,7 +9,7 @@ use Illuminate\Auth\Access\Response;
 /**
  * Data segregation: a user sees and changes only the patients they created.
  * Someone else's patient answers 404 (not 403), so its existence is not revealed.
- * Patients are never deleted through the application.
+ * The owner can delete a patient (with all assessments) — right to erasure.
  */
 class PatientPolicy
 {
@@ -35,8 +35,8 @@ class PatientPolicy
         return $this->view($user, $patient);
     }
 
-    public function delete(User $user, Patient $patient): bool
+    public function delete(User $user, Patient $patient): Response
     {
-        return false;
+        return $this->view($user, $patient);
     }
 }

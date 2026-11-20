@@ -7,9 +7,11 @@ use App\Models\Country;
 use App\Models\Profession;
 use App\Services\Auth\EmailChangeService;
 use App\Services\Institutions\InstitutionResolver;
+use App\Services\Privacy\DataEraser;
 use App\Support\Security\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -27,6 +29,22 @@ class ProfileController extends Controller
         }
 
         return view('profile.complete', $this->formData($request));
+    }
+
+    /**
+     * Deletes the signed-in user's account. Patients and assessments stay as anonymous research data.
+     */
+    public function destroy(Request $request, DataEraser $eraser): RedirectResponse
+    {
+        $request->validate(['confirm' => ['required', 'in:DELETE']], ['confirm.in' => 'Type DELETE to confirm.']);
+        $user = $request->user();
+
+        Auth::guard('web')->logout();
+        $eraser->eraseAccount($user, 'self');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home')->with('status', __('Your account has been deleted.'));
     }
 
     public function edit(Request $request): View

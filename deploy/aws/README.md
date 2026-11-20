@@ -21,6 +21,10 @@ APP_URL, TRUSTED_PROXIES. Then:
 ```
 Back up APP_KEY, BLIND_INDEX_KEY and AUDIT_HMAC_KEY from `.env` to a password manager.
 
+## Scheduler
+`setup.sh` installs a cron entry for `www-data`: `php artisan schedule:run` every minute.
+It runs `data:prune` daily (retention: config/scim.php → `retention`). Check: `sudo crontab -u www-data -l`.
+
 ## Every update
 Merge to `main` → wait for "Build deploy branch" → on the server:
 ```bash
