@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Support\Security\AuditLogger;
 use App\Support\Security\BlindIndex;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -90,6 +92,19 @@ class AppServiceProvider extends ServiceProvider
             if ($event->user) {
                 app(AuditLogger::class)->log('auth.logout', context: ['guard' => $event->guard], actorType: $event->guard === 'web' ? 'user' : $event->guard, actorId: (int) $event->user->getAuthIdentifier());
             }
+        });
+
+        // Every refused authorization (e.g. opening another doctor's patient) is recorded.
+        Gate::after(function ($user, string $ability, $result, array $arguments): void {
+            $denied = $result instanceof Response ? $result->denied() : $result === false;
+            if (! $denied) {
+                return;
+            }
+            $subject = collect($arguments)->first(fn ($a) => $a instanceof Model);
+            app(AuditLogger::class)->log('access.denied', $subject, [
+                'ability' => $ability,
+                'model' => $subject ? class_basename($subject) : (is_string($arguments[0] ?? null) ? class_basename($arguments[0]) : null),
+            ]);
         });
     }
 }

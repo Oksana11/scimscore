@@ -47,6 +47,8 @@ class AssessmentController extends Controller
             ->paginate(25)
             ->withQueryString();
 
+        $this->audit->log('assessment.list_viewed', context: ['filters' => array_keys(array_filter($filters, fn ($v) => $v !== null && $v !== '')), 'page' => $assessments->currentPage()]);
+
         return view('assessments.index', [
             'assessments' => $assessments,
             'filters' => $filters,
@@ -120,6 +122,7 @@ class AssessmentController extends Controller
         Gate::authorize('view', $assessment);
 
         $assessment->load(['result', 'patient']);
+        $this->audit->log('assessment.viewed', $assessment);
 
         return view('assessments.show', [
             'assessment' => $assessment,
@@ -151,6 +154,7 @@ class AssessmentController extends Controller
 
         $pair = $patient->assessments()->with('result')->whereIn('public_id', [$ids['a'], $ids['b']])->orderBy('assessed_on')->orderBy('id')->get();
         abort_unless($pair->count() === 2, 404);
+        $this->audit->log('assessment.compared', $patient, ['assessments' => [$pair[0]->id, $pair[1]->id]]);
 
         return view('assessments.compare', [
             'patient' => $patient,

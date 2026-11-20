@@ -158,6 +158,7 @@ class QuickAssessmentController extends Controller
         $this->authorizeSession($request, $assessment);
 
         $definition = ScimDefinition::for($assessment->scim_version);
+        $this->audit->log('assessment.quick_viewed', $assessment, anonymous: true);
 
         return view('quick.result', [
             'assessment' => $assessment->load(['result', 'consent', 'caregiverProfession', 'caregiverCountry', 'caregiverInstitution']),
@@ -202,6 +203,7 @@ class QuickAssessmentController extends Controller
     public function pdf(Request $request, Assessment $assessment): Response
     {
         $this->authorizeSession($request, $assessment);
+        $this->audit->log('export.pdf', $assessment, anonymous: true);
 
         return $this->exporter->pdf($assessment->load('result'), 'scim-quick-'.$assessment->assessed_on->format('Ymd').'.pdf');
     }
@@ -209,6 +211,7 @@ class QuickAssessmentController extends Controller
     public function xlsx(Request $request, Assessment $assessment): StreamedResponse
     {
         $this->authorizeSession($request, $assessment);
+        $this->audit->log('export.xlsx', $assessment, anonymous: true);
 
         return $this->exporter->xlsx([$assessment->load('result')], 'scim-quick-'.$assessment->assessed_on->format('Ymd').'.xlsx', mode: AssessmentExporter::MODE_QUICK);
     }
