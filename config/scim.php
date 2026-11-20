@@ -18,6 +18,9 @@ return [
 
     // How long data is kept (days). Pruned daily by `php artisan data:prune` (scheduler).
     // Patients, assessments and quick assessments are research data and are not pruned.
+    // dev/demo copies only: allows `php artisan dev:synthetic-data` (never set on production).
+    'allow_synthetic_data' => (bool) env('ALLOW_SYNTHETIC_DATA', false),
+
     'retention' => [
         'otp_days' => 1,
         'support_days' => 730,
