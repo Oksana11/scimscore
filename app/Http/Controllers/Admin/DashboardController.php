@@ -24,6 +24,7 @@ class DashboardController extends AdminController
     public function index(Request $request, AdminStatistics $stats): View
     {
         $f = $this->filters($request);
+        $this->log('admin.view_statistics');
 
         return view('admin.dashboard', [
             'filters' => $f,

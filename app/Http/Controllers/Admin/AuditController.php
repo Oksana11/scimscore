@@ -26,6 +26,8 @@ class AuditController extends AdminController
             ->paginate(100)
             ->withQueryString();
 
+        $this->log('admin.view_audit', context: ['filters' => array_keys(array_filter($f, fn ($v) => $v !== null && $v !== ''))]);
+
         return view('admin.audit', ['logs' => $logs, 'filters' => $f]);
     }
 

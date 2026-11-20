@@ -69,6 +69,9 @@ class PatientController extends Controller
             ->paginate(25)
             ->withQueryString();
 
+        // Only which filters were used — never their values (they may be IDs or aliases).
+        $this->audit->log('patient.list_viewed', context: ['filters' => array_keys(array_filter($f, fn ($v) => $v !== null && $v !== '')), 'page' => $patients->currentPage()]);
+
         return view('patients.index', $this->options() + ['patients' => $patients, 'filters' => $f]);
     }
 
@@ -181,6 +184,7 @@ class PatientController extends Controller
         Gate::authorize('view', $patient);
 
         $assessments = $patient->assessments()->with('result')->orderBy('assessed_on')->orderBy('id')->get();
+        $this->audit->log('patient.viewed', $patient);
 
         return view('patients.show', ['patient' => $patient, 'assessments' => $assessments]);
     }
@@ -188,6 +192,7 @@ class PatientController extends Controller
     public function edit(Patient $patient): View
     {
         Gate::authorize('update', $patient);
+        $this->audit->log('patient.edit_opened', $patient);
 
         return view('patients.edit', $this->options() + ['patient' => $patient]);
     }
