@@ -47,4 +47,14 @@ class SecurityHeadersTest extends TestCase
         $this->get('/')->assertHeaderMissing('Strict-Transport-Security');
         $this->get('https://localhost/')->assertHeader('Strict-Transport-Security');
     }
+
+    public function test_site_isolation_and_no_js_readable_csrf_cookie(): void
+    {
+        $this->withoutVite();
+        $res = $this->get('/');
+
+        $res->assertHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+        $res->assertHeader('Cross-Origin-Opener-Policy', 'same-origin');
+        $res->assertCookieMissing('XSRF-TOKEN');
+    }
 }

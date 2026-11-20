@@ -27,6 +27,8 @@ class SecurityHeaders
         $headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
         $headers->set('Cross-Origin-Opener-Policy', 'same-origin');
         $headers->set('Cross-Origin-Resource-Policy', 'same-origin');
+        // Site isolation (Spectre): everything we load is same-origin.
+        $headers->set('Cross-Origin-Embedder-Policy', 'require-corp');
 
         // Pages may contain personal data: never store in browser/proxy/CDN caches.
         if (! $headers->has('Cache-Control') || ! str_contains((string) $headers->get('Cache-Control'), 'no-store')) {
@@ -49,6 +51,9 @@ class SecurityHeaders
         }
 
         $headers->remove('X-Powered-By');
+        if (! headers_sent()) {
+            header_remove('X-Powered-By'); // added by PHP itself when expose_php is on
+        }
 
         return $response;
     }
