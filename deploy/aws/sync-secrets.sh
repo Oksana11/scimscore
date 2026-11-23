@@ -40,7 +40,10 @@ for KEY in $ALLOWED; do
     echo "  $KEY ← Secrets Manager"
 done
 
-chgrp www-data "$TMP" && chmod 640 "$TMP"
+# ubuntu is not in the www-data group, so changing the group needs sudo. Fail loudly:
+# a .env that php-fpm cannot read takes the site down at the next cache clear.
+sudo chown "$(id -un)":www-data "$TMP"
+chmod 640 "$TMP"
 mv "$TMP" "$ENV"
 trap - EXIT
 echo "Secrets synced from $SECRETS_ID."
