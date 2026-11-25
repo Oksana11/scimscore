@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminSession;
+use App\Http\Middleware\CanonicalHost;
 use App\Http\Middleware\CloudFrontProto;
 use App\Http\Middleware\EnsureProfileComplete;
 use App\Http\Middleware\EnsureUserIsActive;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(CanonicalHost::class);
         $proxies = array_values(array_filter(array_map('trim', explode(',', (string) env('TRUSTED_PROXIES', '')))));
         if ($proxies !== []) {
             // "*" = trust the direct peer (e.g. CloudFront when port 80 is open to CloudFront only).
