@@ -20,6 +20,6 @@ class CanonicalHostTest extends TestCase
         config(['app.url' => 'https://scimscore.com']);
         $this->withoutVite();
 
-        $this->get('http://scimscore.com/terms')->assertOk();
+        $this->get('http://scimscore.com/up')->assertOk();
     }
 }
