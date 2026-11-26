@@ -12,8 +12,11 @@ use App\Enums\ScimVersion;
  *   SCI-ARMI = 100 · SCIM / (30.6 + 1.225·AMS − 0.00474·AMS² − 0.126·Age − 1.96·Sex), Sex: male 0, female 1.
  *   Sections (self-care, respiration/sphincter, mobility): plain sums only.
  *
- * Grade A–H (SCIM III only): nearest of 8 reference profiles of the original
- * scimscore.com (sum of absolute item differences).
+ * Grade A–H: nearest of 8 reference profiles of the original scimscore.com
+ * (sum of absolute item differences), for the questionnaire that defines them.
+ *
+ * The questionnaire of the original scimscore.com is SCIM IV (customer, Nov 2026);
+ * the SCIM III questionnaire is not available yet.
  *
  * Bump CALC_VERSION whenever a formula changes: it is stored with every assessment.
  */

@@ -25,9 +25,9 @@ class PatientAssessmentController extends Controller
         Gate::authorize('view', $patient);
         Gate::authorize('create', [Assessment::class, $patient]);
 
-        $version = ScimVersion::tryFrom((string) $request->query('version', 'III')) ?? ScimVersion::III;
+        $version = ScimVersion::tryFrom((string) $request->query('version', 'IV')) ?? ScimVersion::IV;
         if (! ScimDefinition::isAvailable($version)) {
-            $version = ScimVersion::III;
+            $version = ScimVersion::IV;
         }
 
         $last = $patient->assessments()->latest('assessed_on')->latest('id')->first();

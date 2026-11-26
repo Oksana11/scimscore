@@ -105,9 +105,9 @@ class QuickAssessmentController extends Controller
             return redirect()->route('quick.create');
         }
 
-        $version = ScimVersion::tryFrom((string) $request->query('version', 'III')) ?? ScimVersion::III;
+        $version = ScimVersion::tryFrom((string) $request->query('version', 'IV')) ?? ScimVersion::IV;
         if (! ScimDefinition::isAvailable($version)) {
-            $version = ScimVersion::III;
+            $version = ScimVersion::IV;
         }
 
         return view('quick.create', [

@@ -78,7 +78,7 @@ class SyntheticData extends Command
             return self::FAILURE;
         }
         $countries = array_merge($countries, array_fill(0, 3, in_array('IL', $countries, true) ? 'IL' : $countries[0]));
-        $definition = ScimDefinition::for(ScimVersion::III);
+        $definition = ScimDefinition::for(ScimVersion::IV);
         $allowed = $definition->allowedScores();
 
         $institutions = collect(range(1, 3))->map(fn ($i) => Institution::query()->firstOrCreate(
@@ -120,7 +120,7 @@ class SyntheticData extends Command
                 $level = mt_rand(5, 60) / 100;
                 $date = CarbonImmutable::now()->subDays(mt_rand(200, 720));
                 for ($v = 0, $visits = mt_rand(1, 4); $v < $visits; $v++) {
-                    $recorder->recordForPatient($patient, ScimVersion::III, $this->answers($allowed, $level), new PatientSnapshot(
+                    $recorder->recordForPatient($patient, ScimVersion::IV, $this->answers($allowed, $level), new PatientSnapshot(
                         gender: $patient->gender,
                         age: max(0, $date->year - $patient->birth_year),
                         ams: mt_rand(0, 100),
@@ -139,7 +139,7 @@ class SyntheticData extends Command
 
         for ($q = 1; $q <= (int) $this->option('quick'); $q++) {
             $date = CarbonImmutable::now()->subDays(mt_rand(1, 700));
-            $recorder->recordQuick(ScimVersion::III, $this->answers($allowed, mt_rand(5, 95) / 100), new PatientSnapshot(
+            $recorder->recordQuick(ScimVersion::IV, $this->answers($allowed, mt_rand(5, 95) / 100), new PatientSnapshot(
                 gender: $this->pick(Gender::cases()),
                 age: mt_rand(18, 80),
                 ams: mt_rand(0, 100),

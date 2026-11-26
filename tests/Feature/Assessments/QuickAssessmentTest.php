@@ -58,7 +58,7 @@ class QuickAssessmentTest extends TestCase
         }
 
         return array_replace([
-            'scim_version' => 'III',
+            'scim_version' => 'IV',
             'assessed_on' => now()->toDateString(),
             'patient_code' => 'P-15355',
             'etiology' => 'traumatic',
@@ -191,7 +191,7 @@ class QuickAssessmentTest extends TestCase
 
     public function test_unavailable_version_is_rejected(): void
     {
-        $this->post('/quick', $this->payload(['scim_version' => 'IV']))->assertSessionHasErrors('scim_version');
+        $this->post('/quick', $this->payload(['scim_version' => 'III']))->assertSessionHasErrors('scim_version');
     }
 
     public function test_patient_fields_are_validated(): void

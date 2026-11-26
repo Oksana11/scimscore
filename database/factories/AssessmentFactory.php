@@ -20,7 +20,7 @@ class AssessmentFactory extends Factory
     {
         return [
             'source' => AssessmentSource::Account,
-            'scim_version' => ScimVersion::III,
+            'scim_version' => ScimVersion::IV,
             'assessed_on' => now()->toDateString(),
             'is_first' => false,
             'age' => fake()->numberBetween(18, 85),
