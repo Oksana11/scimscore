@@ -50,7 +50,7 @@ class PatientFlowTest extends TestCase
         }
 
         return array_replace([
-            'scim_version' => 'III',
+            'scim_version' => 'IV',
             'assessed_on' => '2025-06-01',
             'nli' => 'T4',
             'ais' => 'A',

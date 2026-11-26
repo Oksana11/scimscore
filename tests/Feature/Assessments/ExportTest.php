@@ -117,7 +117,7 @@ class ExportTest extends TestCase
         $inst = Institution::factory()->create();
         $this->withSession(['quick.caregiver' => ['profession_id' => $this->user->profile->profession_id, 'country_code' => 'IL', 'institution_id' => $inst->id, 'institution_display' => $inst->name]]);
         $this->post('/quick', [
-            'scim_version' => 'III', 'assessed_on' => now()->toDateString(), 'gender' => 2, 'age' => 30, 'ams' => 40,
+            'scim_version' => 'IV', 'assessed_on' => now()->toDateString(), 'gender' => 2, 'age' => 30, 'ams' => 40,
             'patient_code' => 'Q-1', 'nli' => 'C5', 'ais' => 'B', 'answers' => $answers, 'accept_terms' => '1',
         ])->assertRedirect();
         $id = Assessment::query()->sole()->public_id;

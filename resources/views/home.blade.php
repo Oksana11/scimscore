@@ -40,7 +40,7 @@
             </div>
             <p class="mt-4 text-[15px] text-slate-500">One-time calculation without an account. Nothing is linked to a patient.</p>
             <ul class="mt-4 space-y-1.5 text-[15px] text-slate-700">
-                <li class="flex items-center gap-2"><x-icon name="check" class="size-4 text-slate-400" /> SCIM III or SCIM IV, item by item</li>
+                <li class="flex items-center gap-2"><x-icon name="check" class="size-4 text-slate-400" /> SCIM IV, item by item (SCIM III coming soon)</li>
                 <li class="flex items-center gap-2"><x-icon name="check" class="size-4 text-slate-400" /> Instant total and SCI-ARMI</li>
                 <li class="flex items-center gap-2"><x-icon name="check" class="size-4 text-slate-400" /> Print, PDF or Excel export</li>
             </ul>

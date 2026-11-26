@@ -137,7 +137,7 @@ class EmailController extends AdminController
     {
         $a = new Assessment;
         $a->forceFill([
-            'scim_version' => ScimVersion::III,
+            'scim_version' => ScimVersion::IV,
             'assessed_on' => now()->toDateString(),
             'gender' => Gender::cases()[0],
             'age' => 40,

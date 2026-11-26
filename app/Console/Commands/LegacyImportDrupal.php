@@ -9,7 +9,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 #[Signature('legacy:import-drupal {dump : Path to the mysqldump .sql file of the old site} {--dry-run : Only report what would be imported}')]
-#[Description('Import old scimscore.com (Drupal) SCIM III submissions as anonymous assessments')]
+#[Description('Import old scimscore.com (Drupal) SCIM IV submissions as anonymous assessments')]
 class LegacyImportDrupal extends Command
 {
     public function handle(DrupalImporter $importer, AuditLogger $audit): int

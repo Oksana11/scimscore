@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Imports SCIM III submissions of the old Drupal 6 site (webform module) as anonymous
+ * Imports SCIM IV submissions of the old Drupal 6 site (webform module) as anonymous
  * assessments (source = legacy, no user, no patient).
  *
  * Only these fields are read: answers v1–v19, patient age, gender, AMS, AIS, neurological
@@ -112,7 +112,7 @@ final class DrupalImporter
                     $ams = $this->ams($d['ams'] ?? '');
 
                     try {
-                        $result = $this->calculator->calculate(ScimVersion::III, new ScimInput($answers, $ams, $age, $gender));
+                        $result = $this->calculator->calculate(ScimVersion::IV, new ScimInput($answers, $ams, $age, $gender));
                     } catch (InvalidScimAnswers) {
                         $skip('invalid answers');
 
@@ -134,7 +134,7 @@ final class DrupalImporter
                     $assessment = Assessment::query()->create([
                         'source' => AssessmentSource::Legacy,
                         'consent_id' => $consent->id,
-                        'scim_version' => ScimVersion::III,
+                        'scim_version' => ScimVersion::IV,
                         'assessed_on' => $date->toDateString(),
                         'is_first' => false,
                         'gender' => $gender,
