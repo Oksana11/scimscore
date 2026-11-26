@@ -4,7 +4,7 @@
 @section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / New Patient @endsection
 
 @section('content')
-    <div class="mx-auto max-w-5xl">
+    <div>
         <a href="{{ route('dashboard') }}" class="back-link"><x-icon name="chevron-left" class="size-4" /> Dashboard</a>
         <h1 class="page-title mt-3">New Patient — First Assessment</h1>
         <p class="page-sub">No names, ID numbers, phone numbers, addresses or emails are stored.</p>
