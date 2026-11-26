@@ -3,7 +3,7 @@
 @section('title', 'Result')
 
 @section('content')
-    <div class="mx-auto max-w-[1040px] space-y-5">
+    <div class="mx-auto max-w-6xl space-y-5">
         <div class="print:hidden">
             <a href="{{ route('quick.assessment') }}" class="back-link"><x-icon name="chevron-left" class="size-4" /> New quick assessment</a>
             <div class="mt-4">@include('quick._steps', ['step' => 3])</div>

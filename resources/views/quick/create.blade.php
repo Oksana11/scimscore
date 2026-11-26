@@ -3,7 +3,7 @@
 @section('title', 'Quick Assessment')
 
 @section('content')
-    <div class="mx-auto max-w-[1000px]">
+    <div class="mx-auto max-w-6xl">
         <a href="{{ route('quick.create') }}" class="back-link"><x-icon name="chevron-left" class="size-4" /> Cancel</a>
 
         <div class="mt-3 flex flex-wrap items-start justify-between gap-4">

@@ -4,7 +4,7 @@
 @section('breadcrumb', 'New Assessment')
 
 @section('content')
-    <div class="mx-auto max-w-3xl">
+    <div>
         <h1 class="page-title">New assessment</h1>
         <p class="page-sub">Is this patient already in your list? Always search first to avoid duplicates.</p>
 
