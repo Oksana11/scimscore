@@ -4,7 +4,7 @@
 @section('breadcrumb', 'Profile')
 
 @section('content')
-    <div class="mx-auto max-w-[760px]">
+    <div class="mx-auto max-w-4xl">
         <h1 class="page-title">Profile</h1>
         <p class="page-sub">Your professional details and sign-in email.</p>
 

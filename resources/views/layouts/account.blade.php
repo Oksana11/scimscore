@@ -68,7 +68,7 @@
         </header>
 
         <main class="flex-1 px-5 py-8 [--sticky-top:57px] sm:px-9">
-            <div class="mx-auto max-w-5xl">
+            <div class="mx-auto max-w-7xl">
                 @if (session('status'))
                     <div class="alert-success mb-6" role="status">{{ session('status') }}</div>
                 @endif

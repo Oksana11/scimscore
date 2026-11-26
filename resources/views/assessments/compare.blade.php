@@ -17,7 +17,7 @@
         $defA = $definitions[$a->scim_version->value];
     @endphp
 
-    <div class="mx-auto max-w-4xl space-y-6">
+    <div class="mx-auto max-w-6xl space-y-6">
         <a href="{{ route('patients.show', $patient) }}" class="back-link print:hidden"><x-icon name="chevron-left" class="size-4" /> {{ $patient->system_id }}</a>
         <div class="flex items-start justify-between gap-4">
             <h1 class="page-title">Compare assessments</h1>

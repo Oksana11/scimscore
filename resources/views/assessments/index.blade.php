@@ -22,20 +22,12 @@
         <form method="GET" action="{{ route('assessments.index') }}" class="mt-4 space-y-5">
             <fieldset>
                 <legend class="text-xs font-semibold tracking-wider text-slate-500 uppercase">Patient details</legend>
-                <div class="mt-2 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                <div class="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                         <label class="label" for="f_gender">Gender</label>
                         <select id="f_gender" name="gender" class="input"><option value="">Any</option>
                             @foreach ($genders as $g)<option value="{{ $g->value }}" @selected((string) $sel('gender') === (string) $g->value)>{{ $g->label() }}</option>@endforeach
                         </select>
-                    </div>
-                    <div>
-                        <label class="label" for="f_by1">Born from</label>
-                        <input id="f_by1" name="birth_year_from" type="number" class="input" value="{{ $sel('birth_year_from') }}">
-                    </div>
-                    <div>
-                        <label class="label" for="f_by2">Born to</label>
-                        <input id="f_by2" name="birth_year_to" type="number" class="input" value="{{ $sel('birth_year_to') }}">
                     </div>
                     <div>
                         <label class="label" for="f_nli">Injury level</label>
@@ -49,15 +41,28 @@
                             @foreach ($aisGrades as $a)<option value="{{ $a->value }}" @selected($sel('ais') === $a->value)>{{ $a->value }}</option>@endforeach
                         </select>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="label" for="f_ams1">AMS from</label><input id="f_ams1" name="ams_from" type="number" min="0" max="100" class="input" value="{{ $sel('ams_from') }}"></div>
-                        <div><label class="label" for="f_ams2">to</label><input id="f_ams2" name="ams_to" type="number" min="0" max="100" class="input" value="{{ $sel('ams_to') }}"></div>
+                    <div></div>
+                    <div>
+                        <label class="label" for="f_by1">Year of birth</label>
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                            <input id="f_by1" name="birth_year_from" type="number" min="1900" max="{{ now()->year }}" class="input" placeholder="from" aria-label="Year of birth from" value="{{ $sel('birth_year_from') }}">
+                            <span class="text-slate-400">–</span>
+                            <input id="f_by2" name="birth_year_to" type="number" min="1900" max="{{ now()->year }}" class="input" placeholder="to" aria-label="Year of birth to" value="{{ $sel('birth_year_to') }}">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="label" for="f_ams1">AMS (0–100)</label>
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                            <input id="f_ams1" name="ams_from" type="number" min="0" max="100" class="input" placeholder="from" aria-label="AMS from" value="{{ $sel('ams_from') }}">
+                            <span class="text-slate-400">–</span>
+                            <input id="f_ams2" name="ams_to" type="number" min="0" max="100" class="input" placeholder="to" aria-label="AMS to" value="{{ $sel('ams_to') }}">
+                        </div>
                     </div>
                 </div>
             </fieldset>
             <fieldset>
                 <legend class="text-xs font-semibold tracking-wider text-slate-500 uppercase">Assessment details</legend>
-                <div class="mt-2 grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                <div class="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                         <label class="label" for="f_ver">SCIM version</label>
                         <select id="f_ver" name="version" class="input"><option value="">Any</option>
@@ -71,26 +76,38 @@
                             <option value="followup" @selected($sel('type') === 'followup')>Follow-up</option>
                         </select>
                     </div>
-                    <div><label class="label" for="f_d1">Date from</label><input id="f_d1" name="date_from" type="date" class="input" value="{{ $sel('date_from') }}"></div>
-                    <div><label class="label" for="f_d2">Date to</label><input id="f_d2" name="date_to" type="date" class="input" value="{{ $sel('date_to') }}"></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="label" for="f_t1">SCIM from</label><input id="f_t1" name="total_from" type="number" min="0" max="100" class="input" value="{{ $sel('total_from') }}"></div>
-                        <div><label class="label" for="f_t2">to</label><input id="f_t2" name="total_to" type="number" min="0" max="100" class="input" value="{{ $sel('total_to') }}"></div>
+                    <div class="lg:col-span-2">
+                        <label class="label" for="f_d1">Assessment date</label>
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                            <input id="f_d1" name="date_from" type="date" class="input" aria-label="Date from" value="{{ $sel('date_from') }}">
+                            <span class="text-slate-400">–</span>
+                            <input id="f_d2" name="date_to" type="date" class="input" aria-label="Date to" value="{{ $sel('date_to') }}">
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="label" for="f_s1">SCI-ARMI from</label><input id="f_s1" name="sciarmi_from" type="number" step="0.01" class="input" value="{{ $sel('sciarmi_from') }}"></div>
-                        <div><label class="label" for="f_s2">to</label><input id="f_s2" name="sciarmi_to" type="number" step="0.01" class="input" value="{{ $sel('sciarmi_to') }}"></div>
+                    <div>
+                        <label class="label" for="f_t1">SCIM total (0–100)</label>
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                            <input id="f_t1" name="total_from" type="number" min="0" max="100" class="input" placeholder="from" aria-label="SCIM total from" value="{{ $sel('total_from') }}">
+                            <span class="text-slate-400">–</span>
+                            <input id="f_t2" name="total_to" type="number" min="0" max="100" class="input" placeholder="to" aria-label="SCIM total to" value="{{ $sel('total_to') }}">
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="label" for="f_g1">Grade from</label>
-                            <select id="f_g1" name="grade_from" class="input"><option value="">—</option>
+                    <div>
+                        <label class="label" for="f_s1">SCI-ARMI</label>
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                            <input id="f_s1" name="sciarmi_from" type="number" step="0.01" class="input" placeholder="from" aria-label="SCI-ARMI from" value="{{ $sel('sciarmi_from') }}">
+                            <span class="text-slate-400">–</span>
+                            <input id="f_s2" name="sciarmi_to" type="number" step="0.01" class="input" placeholder="to" aria-label="SCI-ARMI to" value="{{ $sel('sciarmi_to') }}">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="label" for="f_g1">Grade</label>
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                            <select id="f_g1" name="grade_from" class="input" aria-label="Grade from"><option value="">from</option>
                                 @foreach ($grades as $g)<option @selected($sel('grade_from') === $g)>{{ $g }}</option>@endforeach
                             </select>
-                        </div>
-                        <div>
-                            <label class="label" for="f_g2">to</label>
-                            <select id="f_g2" name="grade_to" class="input"><option value="">—</option>
+                            <span class="text-slate-400">–</span>
+                            <select id="f_g2" name="grade_to" class="input" aria-label="Grade to"><option value="">to</option>
                                 @foreach ($grades as $g)<option @selected($sel('grade_to') === $g)>{{ $g }}</option>@endforeach
                             </select>
                         </div>

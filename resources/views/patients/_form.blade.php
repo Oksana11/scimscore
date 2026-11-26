@@ -25,7 +25,7 @@
     </div>
     <div>
         <label for="birth_year" class="label">Year of birth <span class="req">*</span></label>
-        <input id="birth_year" name="birth_year" type="number" min="1900" max="{{ now()->year }}" class="input font-mono" value="{{ $v('birth_year') }}" placeholder="e.g. 1985" required>
+        <input id="birth_year" name="birth_year" type="number" min="1900" max="{{ now()->year }}" class="input" value="{{ $v('birth_year') }}" placeholder="e.g. 1985" required>
         @error('birth_year') <p class="field-error">{{ $message }}</p> @enderror
     </div>
 </div>

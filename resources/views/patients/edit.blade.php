@@ -4,7 +4,7 @@
 @section('breadcrumb')<a href="{{ route('patients.index') }}" class="hover:underline">My Patients</a> / Edit @endsection
 
 @section('content')
-    <div class="mx-auto max-w-[800px]">
+    <div class="mx-auto max-w-5xl">
         <a href="{{ route('patients.show', $patient) }}" class="back-link"><x-icon name="chevron-left" class="size-4" /> {{ $patient->system_id }}</a>
         <h1 class="page-title mt-3">Edit patient details</h1>
 
