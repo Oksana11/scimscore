@@ -4,7 +4,7 @@
 @section('breadcrumb', 'New Assessment')
 
 @section('content')
-    <div class="mx-auto max-w-[900px]">
+    <div class="mx-auto max-w-5xl">
         <a href="{{ route('patients.show', $patient) }}" class="back-link"><x-icon name="chevron-left" class="size-4" /> Cancel</a>
 
         <div class="mt-3 flex flex-wrap items-start justify-between gap-4">
