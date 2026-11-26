@@ -1,0 +1,29 @@
+name: Update composer.lock (one-off)
+on:
+  push:
+    branches: [feat/scim-iv]
+    paths: ['.github/workflows/update-lock-once.yml']
+permissions:
+  contents: write
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, gd, zip, bcmath
+          tools: composer:v2
+      - name: Update vulnerable Symfony packages (security fixes)
+        run: |
+          composer update symfony/http-kernel symfony/mailer symfony/routing --with-all-dependencies --no-install --no-interaction
+          composer audit --locked
+      - name: Commit lock
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add composer.lock
+          git diff --cached --stat
+          git commit -m 'composer: update Symfony packages for CVE-2026-133746/133754 and related advisories'
+          git push
