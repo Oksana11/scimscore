@@ -53,7 +53,7 @@ class ScimCalculatorTest extends TestCase
         $this->assertSame(40, array_sum(array_intersect_key($max, array_flip($sections['mobility']))));
     }
 
-    public function test_scim_iii_sums_and_sci_armi(): void
+    public function test_scim_iv_sums_and_sci_armi(): void
     {
         $r = $this->calc(ScimVersion::IV, new ScimInput($this->answers(self::E), ams: 50, age: 40, gender: Gender::Male));
 
@@ -68,7 +68,7 @@ class ScimCalculatorTest extends TestCase
         $this->assertNull($r->sciarmiRespirationSphincter);
         $this->assertNull($r->sciarmiMobility);
         $this->assertSame('E', $r->grade);
-        $this->assertSame('iii-2026.1', $r->calcVersion);
+        $this->assertSame('iv-2026.1', $r->calcVersion);
     }
 
     public function test_female_sex_term_is_applied(): void
